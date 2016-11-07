@@ -30,6 +30,9 @@
     <ClInclude Include="THResource.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="THType.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -45,6 +48,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="THResource.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="THType.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
