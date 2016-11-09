@@ -9,8 +9,8 @@ namespace Hook
 	struct JmpCode
 	{
 	private:
-		const BYTE m_jmpCode = 0xE9; // JMP指令的机器码，近跳转为E9，可跳至同一个段的范围内的地址
-		DWORD m_relativeAddress; // 相对地址 = 目标地址 - 下一条指令地址 = 目标地址 - 当前地址 - JMP指令长度
+		const BYTE jmpCode = 0xE9; // JMP指令的机器码，近跳转为E9，可跳至同一个段的范围内的地址
+		DWORD relativeAddress; // 相对地址 = 目标地址 - 下一条指令地址 = 目标地址 - 当前地址 - JMP指令长度
 
 	public:
 		JmpCode(DWORD srcAddr, DWORD dstAddr)
@@ -20,7 +20,7 @@ namespace Hook
 
 		void setAddress(DWORD srcAddr, DWORD dstAddr)
 		{
-			m_relativeAddress = dstAddr - srcAddr - 5; // JMP指令长度 = sizeof(JmpCode) = 5
+			relativeAddress = dstAddr - srcAddr - 5; // JMP指令长度 = sizeof(JmpCode) = 5
 		}
 	};
 #pragma pack(pop)
