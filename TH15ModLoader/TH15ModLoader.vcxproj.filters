@@ -36,6 +36,12 @@
     <ClInclude Include="ModManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="APIHeader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="THModEvent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -57,6 +63,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ModManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="THModEvent.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

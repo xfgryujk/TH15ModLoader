@@ -15,7 +15,7 @@ namespace ModManager
 		HMODULE m_module;
 	};
 
-	class ModManager
+	class ModManager final
 	{
 	public:
 		~ModManager();
