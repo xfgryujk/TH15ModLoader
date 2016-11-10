@@ -180,7 +180,7 @@ namespace THType
 		float protectRange;			// 弹幕保护范围的平方，自机这范围内不生成弹幕
 		BYTE unknown14[1088];
 		Unit* pUnit;
-		BYTE unknown14[112];
+		BYTE unknown15[112];
 		Enemy* thiz;
 	};
 

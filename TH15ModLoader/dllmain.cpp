@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "DllHijack.h"
 #include "THResource.h"
+#include "ModManager.h"
 
 
 BOOL APIENTRY DllMain( HMODULE hModule,
@@ -18,9 +19,13 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		if (!THResource::Init())
 			return FALSE;
 
+		ModManager::g_modManager.LoadDir("mods");
+
 		break;
 
 	case DLL_PROCESS_DETACH:
+		ModManager::g_modManager.UnloadAll();
+
 		if (!THResource::Uninit())
 			return FALSE;
 
