@@ -104,14 +104,14 @@ namespace THType
 	// 一条ECL指令
 	struct Ins
 	{
-		float time;
+		DWORD time;				// 当前时间没到time则不执行，实际会转为float再比较
 		WORD code;				// 指令号
 		WORD size;				// 这个ins结构的大小
 		WORD isRefArgFlag;		// 第几位为1代表第几个参数是变量引用
-		WORD flag2;
-		DWORD usedStackSize;	// 执行完这条ins后栈顶指针减去这个数
-		BYTE unknown[3];
-		DWORD args[1];			// 可能是整数或浮点数，实际有多少个参数看size
+		BYTE flag;				// 一般为0xFF，与EclContext某成员与运算后决定是否执行这条指令，某成员一般为0x2
+		BYTE argCount;			// 参数数
+		DWORD usedStackSize;	// 一般为0，执行完这条ins后栈顶指针减去这个数
+		int args[1];			// 可能是int或float，实际有多少个参数看argCount
 	};
 
 	struct BulletGenPoint
