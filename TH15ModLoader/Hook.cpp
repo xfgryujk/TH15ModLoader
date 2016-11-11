@@ -26,14 +26,20 @@ namespace Hook
 #pragma pack(pop)
 
 
-	void HookInlineHook(void* originalFunction, void* hookFunction, void** newFunction, SIZE_T hookLength)
+	bool HookInlineHook(void* originalFunction, void* hookFunction, void** newFunction, SIZE_T hookLength)
 	{
 		// 改变虚拟内存保护，使originalFunction开头可写，用WriteProcessMemory写内存的话好像不用改保护
 		DWORD oldProtect, oldProtect2;
-		VirtualProtect(originalFunction, hookLength, PAGE_EXECUTE_READWRITE, &oldProtect);
+		if (!VirtualProtect(originalFunction, hookLength, PAGE_EXECUTE_READWRITE, &oldProtect))
+			return false;
 
 		// 保存originalFunction开头的指令，originalFunction开头前hookLength字节是完整的指令，如果截断了会出错
 		BYTE* newFunctionCode = (BYTE*)VirtualAlloc(NULL, hookLength + sizeof(JmpCode), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+		if (newFunctionCode == NULL)
+		{
+			VirtualProtect(originalFunction, hookLength, oldProtect, &oldProtect2);
+			return false;
+		}
 		// 保存originalFunction开头前hookLength字节
 		memcpy(newFunctionCode, originalFunction, hookLength);
 		// 从newFunctionCode开头第hookLength + 1字节跳到originalFunction开头第hookLength + 1字节的指令
@@ -48,13 +54,19 @@ namespace Hook
 
 		// 恢复虚拟内存保护
 		VirtualProtect(originalFunction, hookLength, oldProtect, &oldProtect2);
+
+		return true;
 	}
 
-	void UnhookInlineHook(void* originalFunction, void** newFunction, SIZE_T hookLength)
+	bool UnhookInlineHook(void* originalFunction, void** newFunction, SIZE_T hookLength)
 	{
+		if (*newFunction == NULL)
+			return true;
+
 		// 改变虚拟内存保护，使originalFunction开头可写
 		DWORD oldProtect, oldProtect2;
-		VirtualProtect(originalFunction, hookLength, PAGE_EXECUTE_READWRITE, &oldProtect);
+		if (!VirtualProtect(originalFunction, hookLength, PAGE_EXECUTE_READWRITE, &oldProtect))
+			return false;
 		// 恢复originalFunction开头的指令
 		memcpy(originalFunction, *(BYTE**)newFunction, hookLength);
 		// 恢复虚拟内存保护
@@ -63,5 +75,7 @@ namespace Hook
 		// 释放newFunction
 		VirtualFree(*(void**)newFunction, 0, MEM_RELEASE);
 		*(void**)newFunction = NULL;
+
+		return true;
 	}
 }

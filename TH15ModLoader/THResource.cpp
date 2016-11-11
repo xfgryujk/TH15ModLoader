@@ -7,7 +7,7 @@
 namespace THResource
 {
 	static void* const READ_RES_HOOK_ADDR = (void*)0x402E0C;
-	void* g_newReadResEntry = NULL;
+	static void* g_newReadResEntry = NULL;
 
 
 	void* __stdcall MyReadRes(const char* resName, DWORD* pnBytesRead)
@@ -48,14 +48,11 @@ namespace THResource
 
 	bool Init()
 	{
-		Hook::HookInlineHook(READ_RES_HOOK_ADDR, MyReadResWrapper, &g_newReadResEntry, 6);
-		return g_newReadResEntry != NULL;
+		return Hook::HookInlineHook(READ_RES_HOOK_ADDR, MyReadResWrapper, &g_newReadResEntry, 6);
 	}
 
 	bool Uninit()
 	{
-		if (g_newReadResEntry != NULL)
-			Hook::UnhookInlineHook(READ_RES_HOOK_ADDR, &g_newReadResEntry, 6);
-		return true;
+		return Hook::UnhookInlineHook(READ_RES_HOOK_ADDR, &g_newReadResEntry, 6);
 	}
 }

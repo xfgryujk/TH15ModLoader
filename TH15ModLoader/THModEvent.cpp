@@ -4,6 +4,9 @@
 
 namespace THModEvent
 {
+	THMOD_API EventBus g_thEventBus;
+
+
 	int EventBus::AddListener(int eventID, std::function<void(EventBase*)>&& listener)
 	{
 		int& listenerID = m_nextListenerID[eventID];

@@ -61,7 +61,7 @@ namespace ModManager
 	bool ModManager::UnloadAll()
 	{
 		bool res = true;
-		for (size_t i = m_mods.size() - 1; i >= 0; --i)
+		for (int i = (int)m_mods.size() - 1; i >= 0; --i)
 			res = res && Unload(i);
 		return res;
 	}

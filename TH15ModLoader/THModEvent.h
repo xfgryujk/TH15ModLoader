@@ -7,8 +7,11 @@
 namespace THModEvent
 {
 	class EventBase;
+	class EventBus;
 	template class THMOD_API std::map<int, int>;
 	template class THMOD_API std::map<int, std::map<int, std::function<void(EventBase*)> > >;
+
+	extern THMOD_API EventBus g_thEventBus;
 
 
 	class THMOD_API EventBase
@@ -20,6 +23,7 @@ namespace THModEvent
 		virtual ~EventBase() = default;
 
 		bool IsCanceled() { return m_canceled; }
+		// 有些不能取消的事件会忽略
 		void Cancel() { m_canceled = true; }
 	};
 
