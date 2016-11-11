@@ -1,10 +1,12 @@
-﻿#pragma once
+﻿// MOD事件机制实现
+
+#pragma once
 #include "APIHeader.h"
 #include <map>
 #include <functional>
 
 
-namespace THModEvent
+namespace tml
 {
 	class EventBase;
 	class EventBus;

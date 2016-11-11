@@ -2,11 +2,16 @@
 #include "DllHijack.h"
 
 
+namespace tml
+{
 namespace DllHijack
 {
-	static HMODULE g_d3d9Module = NULL;
-	typedef void* (WINAPI* Direct3DCreate9Type)(UINT SDKVersion);
-	static Direct3DCreate9Type RealDirect3DCreate9 = NULL;
+	namespace
+	{
+		HMODULE g_d3d9Module = NULL;
+		typedef void* (WINAPI* Direct3DCreate9Type)(UINT SDKVersion);
+		Direct3DCreate9Type RealDirect3DCreate9 = NULL;
+	}
 
 
 	bool Init()
@@ -35,9 +40,10 @@ namespace DllHijack
 		return result != FALSE;
 	}
 }
+}
 
 #pragma comment(linker, "/EXPORT:Direct3DCreate9=_MyDirect3DCreate9@4")
 extern "C" void* WINAPI MyDirect3DCreate9(UINT SDKVersion)
 {
-	return DllHijack::RealDirect3DCreate9(SDKVersion);
+	return tml::DllHijack::RealDirect3DCreate9(SDKVersion);
 }

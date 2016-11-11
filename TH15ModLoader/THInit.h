@@ -1,8 +1,10 @@
-﻿#pragma once
-#include "THModEvent.h"
+﻿// 和初始化有关的事件
+
+#pragma once
+#include "ModEvent.h"
 
 
-namespace THInit
+namespace tml
 {
 	enum THInitEvent
 	{
@@ -11,6 +13,9 @@ namespace THInit
 	};
 
 
+namespace THInit
+{
 	bool Init();
 	bool Uninit();
+}
 }

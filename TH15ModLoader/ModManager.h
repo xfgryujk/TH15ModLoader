@@ -1,9 +1,11 @@
-﻿#pragma once
+﻿// 加载、卸载MOD
+
+#pragma once
 #include <vector>
 #include <memory>
 
 
-namespace ModManager
+namespace tml
 {
 	class ModManager;
 	extern ModManager g_modManager;

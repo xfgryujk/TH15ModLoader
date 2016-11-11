@@ -1,6 +1,7 @@
 ﻿// dllmain.cpp : 定义 DLL 应用程序的入口点。
 #include "stdafx.h"
 #include <THInit.h>
+using namespace tml;
 
 
 int g_onInitListenerID;
@@ -15,14 +16,14 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
-		g_onInitListenerID = THModEvent::g_thEventBus.AddListener(THInit::THInitEvent::OnInit, 
-			[](THModEvent::EventBase*)
+		g_onInitListenerID = g_thEventBus.AddListener(THInitEvent::OnInit, 
+			[](EventBase*)
 			{
 				MessageBox(NULL, "OnInit!", "ModSample", MB_OK);
 			}
 		);
-		g_onUninitListenerID = THModEvent::g_thEventBus.AddListener(THInit::THInitEvent::OnUninit, 
-			[](THModEvent::EventBase*)
+		g_onUninitListenerID = g_thEventBus.AddListener(THInitEvent::OnUninit, 
+			[](EventBase*)
 			{
 				MessageBox(NULL, "OnUninit!", "ModSample", MB_OK);
 			}
@@ -30,8 +31,8 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		break;
 
 	case DLL_PROCESS_DETACH:
-		THModEvent::g_thEventBus.DeleteListener(THInit::THInitEvent::OnInit, g_onInitListenerID);
-		THModEvent::g_thEventBus.DeleteListener(THInit::THInitEvent::OnUninit, g_onUninitListenerID);
+		g_thEventBus.DeleteListener(THInitEvent::OnInit, g_onInitListenerID);
+		g_thEventBus.DeleteListener(THInitEvent::OnUninit, g_onUninitListenerID);
 		break;
 
 	case DLL_THREAD_ATTACH:

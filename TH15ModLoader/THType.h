@@ -1,5 +1,9 @@
-﻿#pragma once
+﻿// 东方本体程序用的结构、常量声明
 
+#pragma once
+
+namespace tml
+{
 namespace THType
 {
 	struct Struct2;
@@ -201,4 +205,5 @@ namespace THType
 		DWORD unknown6;
 	};
 #pragma pack(pop)
+}
 }

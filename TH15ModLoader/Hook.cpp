@@ -2,28 +2,31 @@
 #include "Hook.h"
 
 
-namespace Hook
+namespace tml
 {
+	namespace
+	{
 #pragma pack(push)
 #pragma pack(1)
-	struct JmpCode
-	{
-	private:
-		const BYTE jmpCode = 0xE9; // JMP指令的机器码，近跳转为E9，可跳至同一个段的范围内的地址
-		DWORD relativeAddress; // 相对地址 = 目标地址 - 下一条指令地址 = 目标地址 - 当前地址 - JMP指令长度
-
-	public:
-		JmpCode(DWORD srcAddr, DWORD dstAddr)
+		struct JmpCode
 		{
-			setAddress(srcAddr, dstAddr);
-		}
+		private:
+			const BYTE jmpCode = 0xE9; // JMP指令的机器码，近跳转为E9，可跳至同一个段的范围内的地址
+			DWORD relativeAddress; // 相对地址 = 目标地址 - 下一条指令地址 = 目标地址 - 当前地址 - JMP指令长度
 
-		void setAddress(DWORD srcAddr, DWORD dstAddr)
-		{
-			relativeAddress = dstAddr - srcAddr - 5; // JMP指令长度 = sizeof(JmpCode) = 5
-		}
-	};
+		public:
+			JmpCode(DWORD srcAddr, DWORD dstAddr)
+			{
+				setAddress(srcAddr, dstAddr);
+			}
+
+			void setAddress(DWORD srcAddr, DWORD dstAddr)
+			{
+				relativeAddress = dstAddr - srcAddr - 5; // JMP指令长度 = sizeof(JmpCode) = 5
+			}
+		};
 #pragma pack(pop)
+	}
 
 
 	bool HookInlineHook(void* originalFunction, void* hookFunction, void** newFunction, SIZE_T hookLength)

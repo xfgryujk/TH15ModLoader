@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\API">
+      <UniqueIdentifier>{63195ecb-fd07-45e9-96f2-979df5fc5dfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\API">
+      <UniqueIdentifier>{6ee276de-286b-47f4-83c9-23d7361ccbd4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -27,23 +33,20 @@
     <ClInclude Include="Hook.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="THResource.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="THType.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="ModManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="APIHeader.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="THModEvent.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="THInit.h">
-      <Filter>头文件</Filter>
+      <Filter>头文件\API</Filter>
+    </ClInclude>
+    <ClInclude Include="ModEvent.h">
+      <Filter>头文件\API</Filter>
+    </ClInclude>
+    <ClInclude Include="THType.h">
+      <Filter>头文件\API</Filter>
+    </ClInclude>
+    <ClInclude Include="APIHeader.h">
+      <Filter>头文件\API</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -59,20 +62,17 @@
     <ClCompile Include="Hook.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="THResource.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="THType.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="ModManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="THModEvent.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="THInit.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\API</Filter>
+    </ClCompile>
+    <ClCompile Include="ModEvent.cpp">
+      <Filter>源文件\API</Filter>
+    </ClCompile>
+    <ClCompile Include="THType.cpp">
+      <Filter>源文件\API</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

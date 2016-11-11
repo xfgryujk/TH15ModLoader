@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
-#include "THModEvent.h"
+#include "ModEvent.h"
 
 
-namespace THModEvent
+namespace tml
 {
 	THMOD_API EventBus g_thEventBus;
 

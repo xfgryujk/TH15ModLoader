@@ -85,8 +85,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="THInit.h" />
-    <ClInclude Include="THModEvent.h" />
-    <ClInclude Include="THResource.h" />
+    <ClInclude Include="ModEvent.h" />
     <ClInclude Include="THType.h" />
   </ItemGroup>
   <ItemGroup>
@@ -106,8 +105,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="THInit.cpp" />
-    <ClCompile Include="THModEvent.cpp" />
-    <ClCompile Include="THResource.cpp" />
+    <ClCompile Include="ModEvent.cpp" />
     <ClCompile Include="THType.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

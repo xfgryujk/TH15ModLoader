@@ -2,7 +2,7 @@
 #include "ModManager.h"
 
 
-namespace ModManager
+namespace tml
 {
 	ModManager g_modManager;
 
