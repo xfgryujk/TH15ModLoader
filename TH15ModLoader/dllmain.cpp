@@ -23,7 +23,6 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 			return FALSE;
 
 		ModManager::g_modManager.LoadDir("mods");
-
 		break;
 
 	case DLL_PROCESS_DETACH:
