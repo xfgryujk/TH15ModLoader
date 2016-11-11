@@ -16,7 +16,8 @@ namespace tml
 		void* g_newReadResEntry = NULL;
 	}
 
-
+	// 初始化
+	
 	void __stdcall MyOnInit()
 	{
 		g_thEventBus.Post(THInitEvent::OnInit);
@@ -31,6 +32,8 @@ namespace tml
 				jmp eax
 		}
 	}
+
+	// 结束
 
 	void __stdcall MyOnUninit()
 	{
@@ -47,20 +50,50 @@ namespace tml
 		}
 	}
 
+	// 读取资源
+
+	ReadResourceEvent::ReadResourceEvent(LPCSTR resName, void*& resBuffer, DWORD*& pnBytesRead) :
+		m_resName(resName), m_resBuffer(resBuffer), m_pnBytesRead(pnBytesRead) { }
+
+	void ReadResourceEvent::SetResBuffer(void* buffer, size_t size)
+	{
+		if (m_resBuffer != NULL)
+			THAPI::free(m_resBuffer);
+		if (buffer == NULL)
+		{
+			m_resBuffer = NULL;
+			if (m_pnBytesRead != NULL)
+				*m_pnBytesRead = 0;
+		}
+		else
+		{
+			m_resBuffer = THAPI::malloc(size);
+			memcpy(m_resBuffer, buffer, size);
+			if (m_pnBytesRead != NULL)
+				*m_pnBytesRead = size;
+		}
+	}
+
 	void* __stdcall MyReadRes(const char* resName, DWORD* pnBytesRead)
 	{
 		char path[MAX_PATH] = "data\\";
 		strcat_s(path, resName);
+		void* buffer = NULL;
 
 		HANDLE file = CreateFileA(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (file == INVALID_HANDLE_VALUE)
-			return NULL;
-		DWORD size = GetFileSize(file, NULL);
-		void* buffer = THAPI::malloc(size);
-		ReadFile(file, buffer, size, &size, NULL);
-		CloseHandle(file);
-		if (pnBytesRead != NULL)
-			*pnBytesRead = size;
+		if (file != INVALID_HANDLE_VALUE)
+		{
+			DWORD size = GetFileSize(file, NULL);
+			buffer = THAPI::malloc(size);
+			ReadFile(file, buffer, size, &size, NULL);
+			CloseHandle(file);
+			if (pnBytesRead != NULL)
+				*pnBytesRead = size;
+		}
+
+		ReadResourceEvent event_(resName, buffer, pnBytesRead);
+		g_thEventBus.Post(THInitEvent::OnReadResource, event_);
+
 		return buffer;
 	}
 
@@ -83,6 +116,9 @@ namespace tml
 			jmp eax
 		}
 	}
+
+
+	// 本模块初始化
 
 namespace THInit
 {
