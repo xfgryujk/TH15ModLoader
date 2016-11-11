@@ -10,13 +10,13 @@ namespace tml
 {
 	class EventBase;
 	class EventBus;
-	template class THMOD_API std::map<int, int>;
-	template class THMOD_API std::map<int, std::map<int, std::function<void(EventBase*)> > >;
+	template class TML_API std::map<int, int>;
+	template class TML_API std::map<int, std::map<int, std::function<void(EventBase*)> > >;
 
-	extern THMOD_API EventBus g_thEventBus;
+	extern TML_API EventBus g_thEventBus;
 
 
-	class THMOD_API EventBase
+	class TML_API EventBase
 	{
 	private:
 		bool m_canceled = false;
@@ -29,7 +29,7 @@ namespace tml
 		void Cancel() { m_canceled = true; }
 	};
 
-	class THMOD_API EventBus final
+	class TML_API EventBus final
 	{
 	private:
 		// eventID -> listenerID

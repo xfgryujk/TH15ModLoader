@@ -4,7 +4,7 @@
 
 namespace tml
 {
-	THMOD_API EventBus g_thEventBus;
+	TML_API EventBus g_thEventBus;
 
 
 	int EventBus::AddListener(int eventID, std::function<void(EventBase*)>&& listener)

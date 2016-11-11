@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "THInit.h"
 #include "Hook.h"
+#include "THAPI.h"
 
 
 namespace tml
@@ -55,8 +56,9 @@ namespace tml
 		if (file == INVALID_HANDLE_VALUE)
 			return NULL;
 		DWORD size = GetFileSize(file, NULL);
-		void* buffer = malloc(size);
+		void* buffer = THAPI::malloc(size);
 		ReadFile(file, buffer, size, &size, NULL);
+		CloseHandle(file);
 		if (pnBytesRead != NULL)
 			*pnBytesRead = size;
 		return buffer;
