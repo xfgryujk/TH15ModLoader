@@ -15,10 +15,10 @@ namespace tml
 		OnInsertStruct2ToStruct1,		// 准备把某个Struct2插入Struct1，事件类型为Struct2Event，可取消
 		OnInsertStruct2ToStruct1Ren,	// 准备把某个Struct2插入Struct1_Ren，事件类型为Struct2Event，可取消
 		OnDeleteStruct2,				// 准备把某个Struct2从Struct1或Struct1_Ren断开和析构，事件类型为Struct2Event，可取消
-		OnInitStage,					// 关卡初始化后
-		OnUninitStage,					// 准备析构关卡
-		OnInsertUnitToStage,			// 准备插入单位
-		OnDeleteUnit					// 单位死亡，准备从Stage断开和析构
+		OnInitStage,					// 关卡初始化后，事件类型为StageEvent
+		OnUninitStage,					// 准备析构关卡，事件类型为StageEvent
+		OnInitUnit,						// 准备初始化和插入单位到Stage，事件类型为InitUnitEvent，可取消
+		OnUninitUnit					// 单位死亡，准备从Stage断开和析构，事件类型为UnitEvent，可取消
 	};
 
 	class TML_API ReadResourceEvent final : public EventBase
@@ -54,6 +54,25 @@ namespace tml
 		THAPI::Stage* const m_pStage;
 
 		StageEvent(THAPI::Stage* pStage);
+	};
+
+	class TML_API InitUnitEvent final : public EventBase
+	{
+	public:
+		// 单位执行的ECL函数名
+		const LPCSTR m_eclFuncName;
+		// 单位初始化用的参数
+		void* const m_pArg;
+
+		InitUnitEvent(LPCSTR eclFuncName, void* pArg);
+	};
+
+	class TML_API UnitEvent final : public EventBase
+	{
+	public:
+		THAPI::Unit* const m_pUnit;
+
+		UnitEvent(THAPI::Unit* pUnit);
 	};
 
 

@@ -16,6 +16,8 @@ namespace tml
 		void* const DELETE_STRUCT2_HOOK_ADDR = (void*)0x4018A0;
 		void* const INIT_STAGE_HOOK_ADDR = (void*)0x426A00;
 		void* const UNINIT_STAGE_HOOK_ADDR = (void*)0x426820;
+		void* const INIT_UNIT_HOOK_ADDR = (void*)0x426050;
+		void* const UNINIT_UNIT_HOOK_ADDR = (void*)0x425330;
 
 		void* g_newOnInitEntry = NULL;
 		void* g_newOnUninitEntry = NULL;
@@ -25,7 +27,10 @@ namespace tml
 		void* g_newDeleteStruct2Entry = NULL;
 		THAPI::Stage*(__fastcall* g_newInitStageEntry)(const char* eclName) = NULL;
 		void*(__fastcall* g_newUninitStageEntry)(THAPI::Stage* pStage) = NULL;
+		void* g_newInitUnitEntry = NULL;
+		void* g_newUninitUnitEntry = NULL;
 	}
+
 
 	// 程序初始化
 	
@@ -60,6 +65,7 @@ namespace tml
 			jmp eax
 		}
 	}
+
 
 	// ReadResourceEvent
 
@@ -130,6 +136,7 @@ namespace tml
 		}
 	}
 
+
 	// Struct2Event
 
 	Struct2Event::Struct2Event(THAPI::Struct2* pStruct2, DWORD order) : 
@@ -173,16 +180,17 @@ namespace tml
 		}
 	}
 
-	__declspec(naked) void MyDeleteStruct2Wrapper()
-	{
-		__asm
-		{
-			pop eax		// 返回地址出栈
-			push ecx	// pStruct1入栈
-			push eax	// 返回地址入栈
-			jmp MyDeleteStruct2
-		}
+#define ThiscallToStdcallWrapper(f) \
+	__declspec(naked) void f##Wrapper() \
+	{ \
+		__asm pop eax\
+		__asm push ecx \
+		__asm push eax \
+		__asm jmp f \
 	}
+
+	ThiscallToStdcallWrapper(MyDeleteStruct2)
+
 
 	// StageEvent
 
@@ -209,6 +217,59 @@ namespace tml
 	}
 
 
+	// InitUnitEvent
+
+	InitUnitEvent::InitUnitEvent(LPCSTR eclFuncName, void* pArg) :
+		m_eclFuncName(eclFuncName), m_pArg(pArg) { }
+
+	// 准备初始化单位
+
+	THAPI::Unit* __stdcall MyInitUnit(THAPI::Stage* pStage, const char* eclFuncName, void* pArg, DWORD unknown)
+	{
+		THAPI::Unit* res = NULL;
+		InitUnitEvent event_(eclFuncName, pArg);
+		if (g_thEventBus.Post(THInitEvent::OnInitUnit, event_))
+		{
+			__asm
+			{
+				push unknown
+				push pArg
+				push eclFuncName
+				mov ecx, pStage
+				call g_newInitUnitEntry
+				mov res, eax
+			}
+		}
+		return res;
+	}
+
+	ThiscallToStdcallWrapper(MyInitUnit)
+
+	// UnitEvent
+
+	UnitEvent::UnitEvent(THAPI::Unit* pUnit) :
+		m_pUnit(pUnit) { }
+
+	// 准备析构单位
+
+	THAPI::Unit* __stdcall MyUninitUnit(THAPI::Unit* pUnit, BOOL bFree)
+	{
+		UnitEvent event_(pUnit);
+		if (g_thEventBus.Post(THInitEvent::OnUninitUnit, event_))
+		{
+			__asm
+			{
+				push bFree
+				mov ecx, pUnit
+				call g_newUninitUnitEntry
+			}
+		}
+		return pUnit;
+	}
+
+	ThiscallToStdcallWrapper(MyUninitUnit)
+
+
 	// 本模块初始化
 
 namespace THInit
@@ -224,6 +285,8 @@ namespace THInit
 		res = res && HookInlineHook(DELETE_STRUCT2_HOOK_ADDR, MyDeleteStruct2Wrapper, &g_newDeleteStruct2Entry, 6);
 		res = res && HookInlineHook(INIT_STAGE_HOOK_ADDR, MyInitStage, (void**)&g_newInitStageEntry, 7);
 		res = res && HookInlineHook(UNINIT_STAGE_HOOK_ADDR, MyUninitStage, (void**)&g_newUninitStageEntry);
+		res = res && HookInlineHook(INIT_UNIT_HOOK_ADDR, MyInitUnitWrapper, (void**)&g_newInitUnitEntry);
+		res = res && HookInlineHook(UNINIT_UNIT_HOOK_ADDR, MyUninitUnitWrapper, (void**)&g_newUninitUnitEntry, 6);
 		return res;
 	}
 
@@ -238,6 +301,8 @@ namespace THInit
 		res = res && UnhookInlineHook(DELETE_STRUCT2_HOOK_ADDR, &g_newDeleteStruct2Entry, 6);
 		res = res && UnhookInlineHook(INIT_STAGE_HOOK_ADDR, (void**)&g_newInitStageEntry, 7);
 		res = res && UnhookInlineHook(UNINIT_STAGE_HOOK_ADDR, (void**)&g_newUninitStageEntry);
+		res = res && UnhookInlineHook(INIT_UNIT_HOOK_ADDR, (void**)&g_newInitUnitEntry);
+		res = res && UnhookInlineHook(UNINIT_UNIT_HOOK_ADDR, (void**)&g_newUninitUnitEntry, 6);
 		return res;
 	}
 }
