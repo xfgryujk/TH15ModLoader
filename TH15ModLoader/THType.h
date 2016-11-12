@@ -4,7 +4,7 @@
 
 namespace tml
 {
-namespace THType
+namespace THAPI
 {
 	struct Struct2;
 	struct Stage;
@@ -44,14 +44,14 @@ namespace THType
 		DWORD unknown6;
 		Struct1_Ren struct1Ren;
 		DWORD unknown7;
-		LinkNode<Struct2>* pNextNode;		// 遍历时候临时用
+		LinkNode<Struct2>* pNextNode;		// 遍历时候临时用，逻辑、渲染链都用到
 		DWORD unknown8;
 	};
 
 	struct Struct2 // size = 0x28
 	{
 		DWORD order;					// 也可能是类型、图层？这个决定在链表中的顺序
-		DWORD flag;						// 已知没有0x2时不执行mainFunction
+		DWORD flag;						// 已知没有0x2时不执行mainFunction，没有0x1时从Struct1断开后不free这个Struct2
 		void* mainFunction;				// 逻辑或渲染函数，参数为param
 		void* onInsertToStruct1;		// 这个Struct2插入Struct1时执行，参数为param
 		void* onLogicEnd;				// 在逻辑链表中有可能执行，没见执行过，参数为param
@@ -64,7 +64,8 @@ namespace THType
 	{
 		DWORD unknown1;
 		Struct2* pStruct2;
-		BYTE unknown[372];
+		Struct2* pStruct2Ren;
+		BYTE unknown[368];
 		EclManager* pEclManager;
 		LinkNode<Unit>* pFirstUnitNode;
 		LinkNode<Unit>* pLastUnitNode;
