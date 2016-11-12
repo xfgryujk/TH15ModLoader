@@ -48,6 +48,14 @@ namespace tml
 		Struct2Event(THAPI::Struct2* pStruct2, DWORD order);
 	};
 
+	class TML_API StageEvent final : public EventBase
+	{
+	public:
+		THAPI::Stage* const m_pStage;
+
+		StageEvent(THAPI::Stage* pStage);
+	};
+
 
 namespace THInit
 {

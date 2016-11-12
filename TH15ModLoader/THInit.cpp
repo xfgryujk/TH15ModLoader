@@ -14,6 +14,8 @@ namespace tml
 		void* const INSERT_STRUCT2_TO_STRUCT1_HOOK_ADDR = (void*)0x401390;
 		void* const INSERT_STRUCT2_TO_STRUCT1REN_HOOK_ADDR = (void*)0x401440;
 		void* const DELETE_STRUCT2_HOOK_ADDR = (void*)0x4018A0;
+		void* const INIT_STAGE_HOOK_ADDR = (void*)0x426A00;
+		void* const UNINIT_STAGE_HOOK_ADDR = (void*)0x426820;
 
 		void* g_newOnInitEntry = NULL;
 		void* g_newOnUninitEntry = NULL;
@@ -21,6 +23,8 @@ namespace tml
 		int(__stdcall* g_newInsertStruct2ToStruct1Entry)(THAPI::Struct2* pStruct2, DWORD order) = NULL;
 		int(__stdcall* g_newInsertStruct2ToStruct1RenEntry)(THAPI::Struct2* pStruct2, DWORD order) = NULL;
 		void* g_newDeleteStruct2Entry = NULL;
+		THAPI::Stage*(__fastcall* g_newInitStageEntry)(const char* eclName) = NULL;
+		void*(__fastcall* g_newUninitStageEntry)(THAPI::Stage* pStage) = NULL;
 	}
 
 	// 程序初始化
@@ -180,6 +184,30 @@ namespace tml
 		}
 	}
 
+	// StageEvent
+
+	StageEvent::StageEvent(THAPI::Stage* pStage) : 
+		m_pStage(pStage) { }
+
+	// 关卡初始化后
+
+	THAPI::Stage* __fastcall MyInitStage(const char* eclName)
+	{
+		THAPI::Stage* pStage = g_newInitStageEntry(eclName);
+		StageEvent event_(pStage);
+		g_thEventBus.Post(THInitEvent::OnInitStage, event_);
+		return pStage;
+	}
+
+	// 准备析构关卡
+
+	void* __fastcall MyUninitStage(THAPI::Stage* pStage)
+	{
+		StageEvent event_(pStage);
+		g_thEventBus.Post(THInitEvent::OnUninitStage, event_);
+		return g_newUninitStageEntry(pStage);
+	}
+
 
 	// 本模块初始化
 
@@ -194,6 +222,8 @@ namespace THInit
 		res = res && HookInlineHook(INSERT_STRUCT2_TO_STRUCT1_HOOK_ADDR, MyInsertStruct2ToStruct1, (void**)&g_newInsertStruct2ToStruct1Entry, 9);
 		res = res && HookInlineHook(INSERT_STRUCT2_TO_STRUCT1REN_HOOK_ADDR, MyInsertStruct2ToStruct1Ren, (void**)&g_newInsertStruct2ToStruct1RenEntry, 9);
 		res = res && HookInlineHook(DELETE_STRUCT2_HOOK_ADDR, MyDeleteStruct2Wrapper, &g_newDeleteStruct2Entry, 6);
+		res = res && HookInlineHook(INIT_STAGE_HOOK_ADDR, MyInitStage, (void**)&g_newInitStageEntry, 7);
+		res = res && HookInlineHook(UNINIT_STAGE_HOOK_ADDR, MyUninitStage, (void**)&g_newUninitStageEntry);
 		return res;
 	}
 
@@ -206,6 +236,8 @@ namespace THInit
 		res = res && UnhookInlineHook(INSERT_STRUCT2_TO_STRUCT1_HOOK_ADDR, (void**)&g_newInsertStruct2ToStruct1Entry, 9);
 		res = res && UnhookInlineHook(INSERT_STRUCT2_TO_STRUCT1REN_HOOK_ADDR, (void**)&g_newInsertStruct2ToStruct1RenEntry, 9);
 		res = res && UnhookInlineHook(DELETE_STRUCT2_HOOK_ADDR, &g_newDeleteStruct2Entry, 6);
+		res = res && UnhookInlineHook(INIT_STAGE_HOOK_ADDR, (void**)&g_newInitStageEntry, 7);
+		res = res && UnhookInlineHook(UNINIT_STAGE_HOOK_ADDR, (void**)&g_newUninitStageEntry);
 		return res;
 	}
 }
