@@ -189,7 +189,7 @@ namespace THAPI
 		Enemy* thiz;
 	};
 
-	// 一个单位可以有多个子单位，一个单位执行一个ECL函数，关卡初始化时第一个单位执行main函数
+	// 一个EclContext执行一个ECL函数，可以有多个EclContext并行，关卡初始化时第一个单位执行main函数
 	struct Unit // size = 0x574C
 	{
 		void* pVTable;							// =0x4CC2E8，第一个虚函数用来执行100以上的ins
