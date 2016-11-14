@@ -2,9 +2,9 @@
 
 namespace tml
 {
-namespace DllHijack
-{
-	bool Init();
-	bool Uninit();
-}
+	namespace DllHijack
+	{
+		bool Init();
+		bool Uninit();
+	}
 }

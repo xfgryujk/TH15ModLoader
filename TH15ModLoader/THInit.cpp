@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "THInit.h"
 #include "Hook.h"
-#include "THAPI.h"
+#include "THFunction.h"
 
 
 namespace tml
@@ -22,11 +22,11 @@ namespace tml
 		void* g_newOnInitEntry = NULL;
 		void* g_newOnUninitEntry = NULL;
 		void* g_newReadResEntry = NULL;
-		int(__stdcall* g_newInsertStruct2ToStruct1Entry)(THAPI::Struct2* pStruct2, DWORD order) = NULL;
-		int(__stdcall* g_newInsertStruct2ToStruct1RenEntry)(THAPI::Struct2* pStruct2, DWORD order) = NULL;
+		int(__stdcall* g_newInsertStruct2ToStruct1Entry)(::THAPI::Struct2* pStruct2, DWORD order) = NULL;
+		int(__stdcall* g_newInsertStruct2ToStruct1RenEntry)(::THAPI::Struct2* pStruct2, DWORD order) = NULL;
 		void* g_newDeleteStruct2Entry = NULL;
-		THAPI::Stage*(__fastcall* g_newInitStageEntry)(const char* eclName) = NULL;
-		void*(__fastcall* g_newUninitStageEntry)(THAPI::Stage* pStage) = NULL;
+		::THAPI::Stage*(__fastcall* g_newInitStageEntry)(const char* eclName) = NULL;
+		void*(__fastcall* g_newUninitStageEntry)(::THAPI::Stage* pStage) = NULL;
 		void* g_newInitUnitEntry = NULL;
 		void* g_newUninitUnitEntry = NULL;
 	}
@@ -36,7 +36,7 @@ namespace tml
 	
 	void __stdcall MyOnInit()
 	{
-		g_thEventBus.Post(THInitEvent::OnInit);
+		g_eventBus.Post(THInitEvent::OnInit);
 	}
 
 	__declspec(naked) void MyOnInitWrapper()
@@ -44,8 +44,7 @@ namespace tml
 		__asm
 		{
 			call MyOnInit
-			mov eax, g_newOnInitEntry
-			jmp eax
+			jmp g_newOnInitEntry
 		}
 	}
 
@@ -53,7 +52,7 @@ namespace tml
 
 	void __stdcall MyOnUninit()
 	{
-		g_thEventBus.Post(THInitEvent::OnUninit);
+		g_eventBus.Post(THInitEvent::OnUninit);
 	}
 
 	__declspec(naked) void MyOnUninitWrapper()
@@ -61,8 +60,7 @@ namespace tml
 		__asm
 		{
 			call MyOnUninit
-			mov eax, g_newOnUninitEntry
-			jmp eax
+			jmp g_newOnUninitEntry
 		}
 	}
 
@@ -111,7 +109,7 @@ namespace tml
 		}
 
 		ReadResourceEvent event_(resName, buffer, pnBytesRead);
-		g_thEventBus.Post(THInitEvent::OnReadResource, event_);
+		g_eventBus.Post(THInitEvent::OnReadResource, event_);
 
 		return buffer;
 	}
@@ -126,8 +124,7 @@ namespace tml
 			test eax, eax
 			jnz NotNull
 			// 返回NULL，交给原函数
-			mov eax, g_newReadResEntry
-			jmp eax
+			jmp g_newReadResEntry
 
 			NotNull: // 不是NULL
 			mov edi, eax
@@ -139,37 +136,37 @@ namespace tml
 
 	// Struct2Event
 
-	Struct2Event::Struct2Event(THAPI::Struct2* pStruct2, DWORD order) : 
+	Struct2Event::Struct2Event(::THAPI::Struct2* pStruct2, DWORD order) :
 		m_pStruct2(pStruct2), m_order(order) { }
 
 	// Struct2插入Struct1
 
-	int __stdcall MyInsertStruct2ToStruct1(THAPI::Struct2* pStruct2, DWORD order)
+	int __stdcall MyInsertStruct2ToStruct1(::THAPI::Struct2* pStruct2, DWORD order)
 	{
 		int res = 1; // 返回非0代表插入失败
 		Struct2Event event_(pStruct2, order);
-		if (g_thEventBus.Post(THInitEvent::OnInsertStruct2ToStruct1, event_))
+		if (g_eventBus.Post(THInitEvent::OnInsertStruct2ToStruct1, event_))
 			res = g_newInsertStruct2ToStruct1Entry(pStruct2, order);
 		return res;
 	}
 
 	// Struct2插入Struct1_Ren
 
-	int __stdcall MyInsertStruct2ToStruct1Ren(THAPI::Struct2* pStruct2, DWORD order)
+	int __stdcall MyInsertStruct2ToStruct1Ren(::THAPI::Struct2* pStruct2, DWORD order)
 	{
 		int res = 1; // 返回非0代表插入失败
 		Struct2Event event_(pStruct2, order);
-		if (g_thEventBus.Post(THInitEvent::OnInsertStruct2ToStruct1Ren, event_))
+		if (g_eventBus.Post(THInitEvent::OnInsertStruct2ToStruct1Ren, event_))
 			res = g_newInsertStruct2ToStruct1RenEntry(pStruct2, order);
 		return res;
 	}
 
 	// Struct2准备断开和析构
 
-	void __stdcall MyDeleteStruct2(THAPI::Struct2* pStruct1, THAPI::Struct2* pStruct2)
+	void __stdcall MyDeleteStruct2(::THAPI::Struct2* pStruct1, ::THAPI::Struct2* pStruct2)
 	{
 		Struct2Event event_(pStruct2, pStruct2->order);
-		if (g_thEventBus.Post(THInitEvent::OnDeleteStruct2, event_))
+		if (g_eventBus.Post(THInitEvent::OnDeleteStruct2, event_))
 		{
 			__asm
 			{
@@ -194,25 +191,25 @@ namespace tml
 
 	// StageEvent
 
-	StageEvent::StageEvent(THAPI::Stage* pStage) : 
+	StageEvent::StageEvent(::THAPI::Stage* pStage) :
 		m_pStage(pStage) { }
 
 	// 关卡初始化后
 
-	THAPI::Stage* __fastcall MyInitStage(const char* eclName)
+	::THAPI::Stage* __fastcall MyInitStage(const char* eclName)
 	{
-		THAPI::Stage* pStage = g_newInitStageEntry(eclName);
+		::THAPI::Stage* pStage = g_newInitStageEntry(eclName);
 		StageEvent event_(pStage);
-		g_thEventBus.Post(THInitEvent::OnInitStage, event_);
+		g_eventBus.Post(THInitEvent::OnInitStage, event_);
 		return pStage;
 	}
 
 	// 准备析构关卡
 
-	void* __fastcall MyUninitStage(THAPI::Stage* pStage)
+	void* __fastcall MyUninitStage(::THAPI::Stage* pStage)
 	{
 		StageEvent event_(pStage);
-		g_thEventBus.Post(THInitEvent::OnUninitStage, event_);
+		g_eventBus.Post(THInitEvent::OnUninitStage, event_);
 		return g_newUninitStageEntry(pStage);
 	}
 
@@ -224,11 +221,11 @@ namespace tml
 
 	// 准备初始化单位
 
-	THAPI::Unit* __stdcall MyInitUnit(THAPI::Stage* pStage, const char* eclFuncName, void* pArg, DWORD unknown)
+	::THAPI::Unit* __stdcall MyInitUnit(::THAPI::Stage* pStage, const char* eclFuncName, void* pArg, DWORD unknown)
 	{
-		THAPI::Unit* res = NULL;
+		::THAPI::Unit* res = NULL;
 		InitUnitEvent event_(eclFuncName, pArg);
-		if (g_thEventBus.Post(THInitEvent::OnInitUnit, event_))
+		if (g_eventBus.Post(THInitEvent::OnInitUnit, event_))
 		{
 			__asm
 			{
@@ -247,15 +244,15 @@ namespace tml
 
 	// UnitEvent
 
-	UnitEvent::UnitEvent(THAPI::Unit* pUnit) :
+	UnitEvent::UnitEvent(::THAPI::Unit* pUnit) :
 		m_pUnit(pUnit) { }
 
 	// 准备析构单位
 
-	THAPI::Unit* __stdcall MyUninitUnit(THAPI::Unit* pUnit, BOOL bFree)
+	::THAPI::Unit* __stdcall MyUninitUnit(::THAPI::Unit* pUnit, BOOL bFree)
 	{
 		UnitEvent event_(pUnit);
-		if (g_thEventBus.Post(THInitEvent::OnUninitUnit, event_))
+		if (g_eventBus.Post(THInitEvent::OnUninitUnit, event_))
 		{
 			__asm
 			{
@@ -272,38 +269,38 @@ namespace tml
 
 	// 本模块初始化
 
-namespace THInit
-{
-	bool Init()
+	namespace THInit
 	{
-		bool res = true;
-		res = res && HookInlineHook(ON_INIT_HOOK_ADDR, MyOnInitWrapper, &g_newOnInitEntry, 11);
-		res = res && HookInlineHook(ON_UNINIT_HOOK_ADDR, MyOnUninitWrapper, &g_newOnUninitEntry);
-		res = res && HookInlineHook(READ_RES_HOOK_ADDR, MyReadResWrapper, &g_newReadResEntry, 6);
-		res = res && HookInlineHook(INSERT_STRUCT2_TO_STRUCT1_HOOK_ADDR, MyInsertStruct2ToStruct1, (void**)&g_newInsertStruct2ToStruct1Entry, 9);
-		res = res && HookInlineHook(INSERT_STRUCT2_TO_STRUCT1REN_HOOK_ADDR, MyInsertStruct2ToStruct1Ren, (void**)&g_newInsertStruct2ToStruct1RenEntry, 9);
-		res = res && HookInlineHook(DELETE_STRUCT2_HOOK_ADDR, MyDeleteStruct2Wrapper, &g_newDeleteStruct2Entry, 6);
-		res = res && HookInlineHook(INIT_STAGE_HOOK_ADDR, MyInitStage, (void**)&g_newInitStageEntry, 7);
-		res = res && HookInlineHook(UNINIT_STAGE_HOOK_ADDR, MyUninitStage, (void**)&g_newUninitStageEntry);
-		res = res && HookInlineHook(INIT_UNIT_HOOK_ADDR, MyInitUnitWrapper, (void**)&g_newInitUnitEntry);
-		res = res && HookInlineHook(UNINIT_UNIT_HOOK_ADDR, MyUninitUnitWrapper, (void**)&g_newUninitUnitEntry, 6);
-		return res;
-	}
+		bool Init()
+		{
+			bool res = true;
+			res = res && HookInlineHook(ON_INIT_HOOK_ADDR, MyOnInitWrapper, &g_newOnInitEntry, 11);
+			res = res && HookInlineHook(ON_UNINIT_HOOK_ADDR, MyOnUninitWrapper, &g_newOnUninitEntry);
+			res = res && HookInlineHook(READ_RES_HOOK_ADDR, MyReadResWrapper, &g_newReadResEntry, 6);
+			res = res && HookInlineHook(INSERT_STRUCT2_TO_STRUCT1_HOOK_ADDR, MyInsertStruct2ToStruct1, (void**)&g_newInsertStruct2ToStruct1Entry, 9);
+			res = res && HookInlineHook(INSERT_STRUCT2_TO_STRUCT1REN_HOOK_ADDR, MyInsertStruct2ToStruct1Ren, (void**)&g_newInsertStruct2ToStruct1RenEntry, 9);
+			res = res && HookInlineHook(DELETE_STRUCT2_HOOK_ADDR, MyDeleteStruct2Wrapper, &g_newDeleteStruct2Entry, 6);
+			res = res && HookInlineHook(INIT_STAGE_HOOK_ADDR, MyInitStage, (void**)&g_newInitStageEntry, 7);
+			res = res && HookInlineHook(UNINIT_STAGE_HOOK_ADDR, MyUninitStage, (void**)&g_newUninitStageEntry);
+			res = res && HookInlineHook(INIT_UNIT_HOOK_ADDR, MyInitUnitWrapper, (void**)&g_newInitUnitEntry);
+			res = res && HookInlineHook(UNINIT_UNIT_HOOK_ADDR, MyUninitUnitWrapper, (void**)&g_newUninitUnitEntry, 6);
+			return res;
+		}
 
-	bool Uninit()
-	{
-		bool res = true;
-		res = res && UnhookInlineHook(ON_INIT_HOOK_ADDR, &g_newOnInitEntry, 11);
-		res = res && UnhookInlineHook(ON_UNINIT_HOOK_ADDR, &g_newOnUninitEntry);
-		res = res && UnhookInlineHook(READ_RES_HOOK_ADDR, &g_newReadResEntry, 6);
-		res = res && UnhookInlineHook(INSERT_STRUCT2_TO_STRUCT1_HOOK_ADDR, (void**)&g_newInsertStruct2ToStruct1Entry, 9);
-		res = res && UnhookInlineHook(INSERT_STRUCT2_TO_STRUCT1REN_HOOK_ADDR, (void**)&g_newInsertStruct2ToStruct1RenEntry, 9);
-		res = res && UnhookInlineHook(DELETE_STRUCT2_HOOK_ADDR, &g_newDeleteStruct2Entry, 6);
-		res = res && UnhookInlineHook(INIT_STAGE_HOOK_ADDR, (void**)&g_newInitStageEntry, 7);
-		res = res && UnhookInlineHook(UNINIT_STAGE_HOOK_ADDR, (void**)&g_newUninitStageEntry);
-		res = res && UnhookInlineHook(INIT_UNIT_HOOK_ADDR, (void**)&g_newInitUnitEntry);
-		res = res && UnhookInlineHook(UNINIT_UNIT_HOOK_ADDR, (void**)&g_newUninitUnitEntry, 6);
-		return res;
+		bool Uninit()
+		{
+			bool res = true;
+			res = res && UnhookInlineHook(ON_INIT_HOOK_ADDR, &g_newOnInitEntry, 11);
+			res = res && UnhookInlineHook(ON_UNINIT_HOOK_ADDR, &g_newOnUninitEntry);
+			res = res && UnhookInlineHook(READ_RES_HOOK_ADDR, &g_newReadResEntry, 6);
+			res = res && UnhookInlineHook(INSERT_STRUCT2_TO_STRUCT1_HOOK_ADDR, (void**)&g_newInsertStruct2ToStruct1Entry, 9);
+			res = res && UnhookInlineHook(INSERT_STRUCT2_TO_STRUCT1REN_HOOK_ADDR, (void**)&g_newInsertStruct2ToStruct1RenEntry, 9);
+			res = res && UnhookInlineHook(DELETE_STRUCT2_HOOK_ADDR, &g_newDeleteStruct2Entry, 6);
+			res = res && UnhookInlineHook(INIT_STAGE_HOOK_ADDR, (void**)&g_newInitStageEntry, 7);
+			res = res && UnhookInlineHook(UNINIT_STAGE_HOOK_ADDR, (void**)&g_newUninitStageEntry);
+			res = res && UnhookInlineHook(INIT_UNIT_HOOK_ADDR, (void**)&g_newInitUnitEntry);
+			res = res && UnhookInlineHook(UNINIT_UNIT_HOOK_ADDR, (void**)&g_newUninitUnitEntry, 6);
+			return res;
+		}
 	}
-}
 }

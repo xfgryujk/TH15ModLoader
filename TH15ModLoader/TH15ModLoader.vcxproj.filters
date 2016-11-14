@@ -48,7 +48,7 @@
     <ClInclude Include="APIHeader.h">
       <Filter>头文件\API</Filter>
     </ClInclude>
-    <ClInclude Include="THAPI.h">
+    <ClInclude Include="THFunction.h">
       <Filter>头文件\API</Filter>
     </ClInclude>
   </ItemGroup>
@@ -77,7 +77,7 @@
     <ClCompile Include="THType.cpp">
       <Filter>源文件\API</Filter>
     </ClCompile>
-    <ClCompile Include="THAPI.cpp">
+    <ClCompile Include="THFunction.cpp">
       <Filter>源文件\API</Filter>
     </ClCompile>
   </ItemGroup>

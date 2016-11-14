@@ -41,19 +41,19 @@ namespace tml
 	class TML_API Struct2Event final : public EventBase
 	{
 	public:
-		THAPI::Struct2* const m_pStruct2;
+		::THAPI::Struct2* const m_pStruct2;
 		// 插入之前Struct2的order未初始化，应依赖这个判断
 		const DWORD m_order;
 
-		Struct2Event(THAPI::Struct2* pStruct2, DWORD order);
+		Struct2Event(::THAPI::Struct2* pStruct2, DWORD order);
 	};
 
 	class TML_API StageEvent final : public EventBase
 	{
 	public:
-		THAPI::Stage* const m_pStage;
+		::THAPI::Stage* const m_pStage;
 
-		StageEvent(THAPI::Stage* pStage);
+		StageEvent(::THAPI::Stage* pStage);
 	};
 
 	class TML_API InitUnitEvent final : public EventBase
@@ -70,15 +70,15 @@ namespace tml
 	class TML_API UnitEvent final : public EventBase
 	{
 	public:
-		THAPI::Unit* const m_pUnit;
+		::THAPI::Unit* const m_pUnit;
 
-		UnitEvent(THAPI::Unit* pUnit);
+		UnitEvent(::THAPI::Unit* pUnit);
 	};
 
 
-namespace THInit
-{
-	bool Init();
-	bool Uninit();
-}
+	namespace THInit
+	{
+		bool Init();
+		bool Uninit();
+	}
 }

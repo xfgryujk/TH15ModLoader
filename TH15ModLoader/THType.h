@@ -2,8 +2,6 @@
 
 #pragma once
 
-namespace tml
-{
 namespace THAPI
 {
 	struct Struct2;
@@ -119,7 +117,7 @@ namespace THAPI
 	{
 		float x;
 		float y;
-		DWORD unknown;
+		float z;
 	};
 
 	struct Danmaku // size = 0x380
@@ -206,5 +204,4 @@ namespace THAPI
 		DWORD unknown6;
 	};
 #pragma pack(pop)
-}
 }

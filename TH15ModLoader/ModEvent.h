@@ -13,7 +13,7 @@ namespace tml
 	template class TML_API std::map<int, int>;
 	template class TML_API std::map<int, std::map<int, std::function<void(EventBase*)> > >;
 
-	extern TML_API EventBus g_thEventBus;
+	extern TML_API EventBus g_eventBus;
 
 
 	class TML_API EventBase

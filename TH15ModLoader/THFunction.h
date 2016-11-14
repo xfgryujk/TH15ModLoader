@@ -3,11 +3,8 @@
 #pragma once
 #include "APIHeader.h"
 
-namespace tml
-{
 namespace THAPI
 {
 	extern TML_API void*(__cdecl* const malloc)(size_t dwBytes);
 	extern TML_API void(__cdecl* const free)(void* lpMem);
-}
 }
