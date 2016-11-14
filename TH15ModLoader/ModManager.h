@@ -1,33 +1,38 @@
 ﻿// 加载、卸载MOD
 
 #pragma once
+#include <string>
 #include <vector>
 #include <memory>
 
 
 namespace tml
 {
-	class ModManager;
-	extern ModManager g_modManager;
-
-
 	class Mod
 	{
 	public:
+		std::string m_path;
 		HMODULE m_module;
 	};
 
 	class ModManager final
 	{
-	public:
-		~ModManager();
-
-		bool LoadMod(LPCSTR path);
-		bool LoadDir(LPCSTR dir);
-		bool Unload(int index);
-		bool UnloadAll();
-
 	private:
 		std::vector<std::unique_ptr<Mod> > m_mods;
+
+		ModManager() = default;
+		~ModManager();
+
+	public:
+		static ModManager& GetInstance()
+		{
+			static ModManager s_instance;
+			return s_instance;
+		}
+
+		bool LoadMod(LPCSTR path);
+		void LoadDir(LPCSTR dir);
+		bool UnloadMod(int index);
+		void UnloadAll();
 	};
 }

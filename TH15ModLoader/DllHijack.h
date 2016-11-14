@@ -2,9 +2,21 @@
 
 namespace tml
 {
-	namespace DllHijack
+	class DllHijack final
 	{
-		bool Init();
-		bool Uninit();
-	}
+	private:
+		HMODULE m_d3d9Module = NULL;
+
+		DllHijack();
+		~DllHijack();
+
+	public:
+		static DllHijack& GetInstance()
+		{
+			static DllHijack s_instance;
+			return s_instance;
+		}
+
+		bool IsReady();
+	};
 }

@@ -54,6 +54,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;TH15MODLOADER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -62,6 +63,9 @@
     <PostBuildEvent>
       <Command>copy /y "$(TargetPath)" "$(TH15)\d3d9.dll"</Command>
     </PostBuildEvent>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -93,6 +97,7 @@
     <ClInclude Include="THFunction.h" />
     <ClInclude Include="THInit.h" />
     <ClInclude Include="ModEvent.h" />
+    <ClInclude Include="THInit_.h" />
     <ClInclude Include="THType.h" />
   </ItemGroup>
   <ItemGroup>

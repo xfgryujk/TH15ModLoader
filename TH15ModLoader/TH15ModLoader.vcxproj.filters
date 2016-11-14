@@ -51,6 +51,9 @@
     <ClInclude Include="THFunction.h">
       <Filter>头文件\API</Filter>
     </ClInclude>
+    <ClInclude Include="THInit_.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
