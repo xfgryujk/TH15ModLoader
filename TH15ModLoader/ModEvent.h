@@ -8,11 +8,7 @@
 
 namespace tml
 {
-	class EventBase;
 	class EventBus;
-	template class TML_API std::map<int, int>;
-	template class TML_API std::map<int, std::map<int, std::function<void(EventBase*)> > >;
-
 	extern TML_API EventBus g_eventBus;
 
 
@@ -29,19 +25,30 @@ namespace tml
 		void Cancel() { m_canceled = true; }
 	};
 
+#pragma warning(push)
+#pragma warning(disable: 4251)
 	class TML_API EventBus final
 	{
 	private:
+		class Listener
+		{
+		public:
+			std::function<void(EventBase*)> m_callback;
+			HMODULE m_module = NULL;
+		};
+
 		// eventID -> listenerID
 		std::map<int, int> m_nextListenerID;
 		// eventID -> listenerID -> listener
-		std::map<int, std::map<int, std::function<void(EventBase*)> > > m_listeners;
+		std::map<int, std::map<int, Listener> > m_listeners;
 
 	public:
-		// 返回listener ID
-		int AddListener(int eventID, std::function<void(EventBase*)>&& listener);
+		// 返回listener ID，如果指定module则在MOD卸载时会自动删除，否则需要手动删除
+		int AddListener(int eventID, std::function<void(EventBase*)>&& callback, HMODULE module = NULL);
 		void DeleteListener(int eventID, int listenerID);
+		void DeleteListenersOfModule(HMODULE module);
 		// 如果事件被取消返回false
 		bool Post(int eventID, EventBase& event_ = EventBase());
 	};
+#pragma warning(pop)
 }

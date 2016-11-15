@@ -17,7 +17,7 @@ namespace tml
 	int __stdcall MyOnCallStruct2(Struct2* pStruct2)
 	{
 		CallStruct2Event event_(*pStruct2);
-		if (g_eventBus.Post(THInitEvent::OnInit, event_))
+		if (g_eventBus.Post(THLogicEvent::OnCallStruct2, event_))
 			event_.result = -1;
 		else if (event_.result == -1)
 			event_.result = 1;

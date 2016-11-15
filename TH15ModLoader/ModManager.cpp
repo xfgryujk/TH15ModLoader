@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "ModManager.h"
+#include "ModEvent.h"
 
 
 namespace tml
@@ -43,6 +44,7 @@ namespace tml
 	{
 		_RPTF1(_CRT_WARN, "卸载MOD：%s\n", m_mods[index]->m_path.c_str());
 
+		g_eventBus.DeleteListenersOfModule(m_mods[index]->m_module);
 		if (!FreeLibrary(m_mods[index]->m_module))
 			return false;
 		m_mods.erase(m_mods.begin() + index);

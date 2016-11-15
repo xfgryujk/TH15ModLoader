@@ -7,10 +7,12 @@ namespace tml
 	TML_API EventBus g_eventBus;
 
 
-	int EventBus::AddListener(int eventID, std::function<void(EventBase*)>&& listener)
+	int EventBus::AddListener(int eventID, std::function<void(EventBase*)>&& callback, HMODULE module)
 	{
 		int& listenerID = m_nextListenerID[eventID];
-		m_listeners[eventID][listenerID] = listener;
+		Listener& listener = m_listeners[eventID][listenerID];
+		listener.m_callback = std::move(callback);
+		listener.m_module = module;
 		return listenerID++;
 	}
 
@@ -19,10 +21,24 @@ namespace tml
 		m_listeners[eventID].erase(listenerID);
 	}
 
+	void EventBus::DeleteListenersOfModule(HMODULE module)
+	{
+		for (auto& i : m_listeners)
+		{
+			for (auto it = i.second.begin(); it != i.second.end();)
+			{
+				if (it->second.m_module == module)
+					it = i.second.erase(it);
+				else
+					++it;
+			}
+		}
+	}
+
 	bool EventBus::Post(int eventID, EventBase& event_)
 	{
 		for (const auto& i : m_listeners[eventID])
-			i.second(&event_);
+			i.second.m_callback(&event_);
 		return !event_.IsCanceled();
 	}
 }
