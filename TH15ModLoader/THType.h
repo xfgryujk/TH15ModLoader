@@ -1,6 +1,11 @@
-﻿// 东方本体程序用的结构、常量声明
+﻿// 东方本体程序用的结构、全局变量声明
 
 #pragma once
+#include "APIHeader.h"
+
+struct IDirect3D9;
+struct IDirect3DDevice9;
+
 
 namespace THAPI
 {
@@ -97,7 +102,7 @@ namespace THAPI
 		DWORD varOffset;			// 栈中局部变量的位置
 		DWORD unknown1;
 		Unit* pUnit;
-		BYTE unknown[460];
+		BYTE unknown2[460];
 	};
 
 	// 一条ECL指令
@@ -204,4 +209,19 @@ namespace THAPI
 		DWORD unknown6;
 	};
 #pragma pack(pop)
+
+
+	// 全局变量
+
+	extern TML_API IDirect3D9*& g_pD3D;
+	extern TML_API IDirect3DDevice9*& g_pDevice;
+
+	extern TML_API HWND& g_hMainWnd;
+	extern TML_API HINSTANCE& g_hInstance;
+
+	extern TML_API Struct1*& g_pStruct1;
+	extern TML_API Stage*& g_pStage;
+
+	extern TML_API int& g_playerLife;
+	extern TML_API int& g_playerBomb;
 }

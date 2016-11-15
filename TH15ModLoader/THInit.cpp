@@ -53,6 +53,8 @@ namespace tml
 	
 	void __stdcall MyOnInit()
 	{
+		_RPTF0(_CRT_WARN, "程序初始化\n");
+
 		g_eventBus.Post(THInitEvent::OnInit);
 	}
 
@@ -69,6 +71,8 @@ namespace tml
 
 	void __stdcall MyOnUninit()
 	{
+		_RPTF0(_CRT_WARN, "程序结束\n");
+
 		g_eventBus.Post(THInitEvent::OnUninit);
 	}
 
