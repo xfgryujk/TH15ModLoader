@@ -26,6 +26,7 @@ namespace THAPI
 		LinkNode* unknown; // 貌似和next一样
 	};
 
+	// 储存渲染链表，每帧被遍历调用
 	struct Struct1_Ren
 	{
 		DWORD unknown1;
@@ -36,6 +37,7 @@ namespace THAPI
 		LinkNode<Struct2> firstRenderNode;
 	};
 
+	// 储存逻辑链表，每帧被遍历调用
 	struct Struct1 // size = 0x58
 	{
 		DWORD unknown1;
@@ -51,15 +53,16 @@ namespace THAPI
 		DWORD unknown8;
 	};
 
+	// 每帧被遍历时mainFunction被调用
 	struct Struct2 // size = 0x28
 	{
 		DWORD order;					// 也可能是类型、图层？这个决定在链表中的顺序
 		DWORD flag;						// 已知没有0x2时不执行mainFunction，没有0x1时从Struct1断开后不free这个Struct2
-		void* mainFunction;				// 逻辑或渲染函数，参数为param
-		void* onInsertToStruct1;		// 这个Struct2插入Struct1时执行，参数为param
-		void* onLogicEnd;				// 在逻辑链表中有可能执行，没见执行过，参数为param
+		void* mainFunction;				// 逻辑或渲染函数，thiscall，参数为param
+		void* onInsertToStruct1;		// 这个Struct2插入Struct1时执行，thiscall，参数为param
+		void* onLogicEnd;				// 在逻辑链表中有可能执行，没见执行过，thiscall，参数为param
 		LinkNode<Struct2> linkNode;
-		void* param;					// order为26时是g_pStage
+		void* param;					// 逻辑链中order为26时是g_pStage
 	};
 
 	// 每个关卡初始化一次的全局变量

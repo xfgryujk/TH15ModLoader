@@ -36,9 +36,6 @@
     <ClInclude Include="ModManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="THInit.h">
-      <Filter>头文件\API</Filter>
-    </ClInclude>
     <ClInclude Include="ModEvent.h">
       <Filter>头文件\API</Filter>
     </ClInclude>
@@ -51,7 +48,22 @@
     <ClInclude Include="THFunction.h">
       <Filter>头文件\API</Filter>
     </ClInclude>
-    <ClInclude Include="THInit_.h">
+    <ClInclude Include="THInitEvent.h">
+      <Filter>头文件\API</Filter>
+    </ClInclude>
+    <ClInclude Include="THInit.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="THInitHook.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="THLogicEvent.h">
+      <Filter>头文件\API</Filter>
+    </ClInclude>
+    <ClInclude Include="THLogic.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="THLogicHook.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -81,6 +93,9 @@
       <Filter>源文件\API</Filter>
     </ClCompile>
     <ClCompile Include="THFunction.cpp">
+      <Filter>源文件\API</Filter>
+    </ClCompile>
+    <ClCompile Include="THLogic.cpp">
       <Filter>源文件\API</Filter>
     </ClCompile>
   </ItemGroup>

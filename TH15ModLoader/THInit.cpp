@@ -1,54 +1,13 @@
 ﻿#include "stdafx.h"
+#include "THInitEvent.h"
+#include "THInitHook.h"
 #include "THInit.h"
-#include "THInit_.h"
-#include "Hook.h"
 #include "THFunction.h"
 using namespace THAPI;
 
 
 namespace tml
 {
-	void MyOnInitWrapper();
-	void MyOnUninitWrapper();
-	void MyReadResWrapper();
-	int __stdcall MyInsertStruct2ToStruct1(THAPI::Struct2* pStruct2, DWORD order);
-	int __stdcall MyInsertStruct2ToStruct1Ren(THAPI::Struct2* pStruct2, DWORD order);
-	void MyDeleteStruct2Wrapper();
-	Stage* __fastcall MyInitStage(const char* eclName);
-	void* __fastcall MyUninitStage(Stage* pStage);
-	void MyInitUnitWrapper();
-	void MyUninitUnitWrapper();
-
-	// 本模块初始化
-
-	InlineHook g_onInitHook((void*)0x4719B0, MyOnInitWrapper, 11);
-	InlineHook g_onUninitHook((void*)0x471CB8, MyOnUninitWrapper);
-	InlineHook g_onReadResourceHook((void*)0x402E0C, MyReadResWrapper, 6);
-	InlineHook g_onInsertStruct2ToStruct1Hook((void*)0x401390, MyInsertStruct2ToStruct1, 9);
-	InlineHook g_onInsertStruct2ToStruct1RenHook((void*)0x401440, MyInsertStruct2ToStruct1Ren, 9);
-	InlineHook g_onDeleteStruct2Hook((void*)0x4018A0, MyDeleteStruct2Wrapper, 6);
-	InlineHook g_onInitStageHook((void*)0x426A00, MyInitStage, 7);
-	InlineHook g_onUninitStageHook((void*)0x426820, MyUninitStage);
-	InlineHook g_onInitUnitHook((void*)0x426050, MyInitUnitWrapper);
-	InlineHook g_onUninitUnitHook((void*)0x425330, MyUninitUnitWrapper, 6);
-
-	bool THInit::IsReady()
-	{
-		bool res = true;
-		res = res && g_onInitHook.IsEnabled();
-		res = res && g_onUninitHook.IsEnabled();
-		res = res && g_onReadResourceHook.IsEnabled();
-		res = res && g_onInsertStruct2ToStruct1Hook.IsEnabled();
-		res = res && g_onInsertStruct2ToStruct1RenHook.IsEnabled();
-		res = res && g_onDeleteStruct2Hook.IsEnabled();
-		res = res && g_onInitStageHook.IsEnabled();
-		res = res && g_onUninitStageHook.IsEnabled();
-		res = res && g_onInitUnitHook.IsEnabled();
-		res = res && g_onUninitUnitHook.IsEnabled();
-		return res;
-	}
-
-
 	// 程序初始化
 	
 	void __stdcall MyOnInit()
@@ -158,8 +117,8 @@ namespace tml
 
 	// Struct2Event
 
-	Struct2Event::Struct2Event(Struct2* pStruct2, DWORD order) :
-		m_pStruct2(pStruct2), m_order(order) { }
+	Struct2Event::Struct2Event(Struct2& struct2, DWORD order) :
+		m_struct2(struct2), m_order(order) { }
 
 	// Struct2插入Struct1
 
@@ -168,7 +127,7 @@ namespace tml
 		_RPTF2(_CRT_WARN, "插入Struct2到Struct1 (0x%X, %u)\n", pStruct2, order);
 
 		int res = 1; // 返回非0代表插入失败
-		Struct2Event event_(pStruct2, order);
+		Struct2Event event_(*pStruct2, order);
 		if (g_eventBus.Post(THInitEvent::OnInsertStruct2ToStruct1, event_))
 			res = ((int(__stdcall*)(Struct2* pStruct2, DWORD order))g_onInsertStruct2ToStruct1Hook.m_newEntry)(pStruct2, order);
 		return res;
@@ -181,7 +140,7 @@ namespace tml
 		_RPTF2(_CRT_WARN, "插入Struct2到Struct1Ren (0x%X, %u)\n", pStruct2, order);
 
 		int res = 1; // 返回非0代表插入失败
-		Struct2Event event_(pStruct2, order);
+		Struct2Event event_(*pStruct2, order);
 		if (g_eventBus.Post(THInitEvent::OnInsertStruct2ToStruct1Ren, event_))
 			res = ((int(__stdcall*)(Struct2* pStruct2, DWORD order))g_onInsertStruct2ToStruct1RenHook.m_newEntry)(pStruct2, order);
 		return res;
@@ -193,7 +152,7 @@ namespace tml
 	{
 		_RPTF2(_CRT_WARN, "删除Struct2 (0x%X, %u)\n", pStruct2, pStruct2->order);
 
-		Struct2Event event_(pStruct2, pStruct2->order);
+		Struct2Event event_(*pStruct2, pStruct2->order);
 		if (g_eventBus.Post(THInitEvent::OnDeleteStruct2, event_))
 		{
 			__asm
@@ -219,15 +178,15 @@ namespace tml
 
 	// StageEvent
 
-	StageEvent::StageEvent(Stage* pStage) :
-		m_pStage(pStage) { }
+	StageEvent::StageEvent(Stage& stage) :
+		m_stage(stage) { }
 
 	// 关卡初始化后
 
 	Stage* __fastcall MyInitStage(const char* eclName)
 	{
 		Stage* pStage = ((Stage*(__fastcall*)(const char* eclName))g_onInitStageHook.m_newEntry)(eclName);
-		StageEvent event_(pStage);
+		StageEvent event_(*pStage);
 		g_eventBus.Post(THInitEvent::OnInitStage, event_);
 		return pStage;
 	}
@@ -236,7 +195,7 @@ namespace tml
 
 	void* __fastcall MyUninitStage(Stage* pStage)
 	{
-		StageEvent event_(pStage);
+		StageEvent event_(*pStage);
 		g_eventBus.Post(THInitEvent::OnUninitStage, event_);
 		return ((void*(__fastcall*)(Stage* pStage))g_onUninitStageHook.m_newEntry)(pStage);
 	}
@@ -272,14 +231,14 @@ namespace tml
 
 	// UnitEvent
 
-	UnitEvent::UnitEvent(Unit* pUnit) :
-		m_pUnit(pUnit) { }
+	UnitEvent::UnitEvent(Unit& unit) :
+		m_unit(unit) { }
 
 	// 准备析构单位
 
 	Unit* __stdcall MyUninitUnit(Unit* pUnit, BOOL bFree)
 	{
-		UnitEvent event_(pUnit);
+		UnitEvent event_(*pUnit);
 		if (g_eventBus.Post(THInitEvent::OnUninitUnit, event_))
 		{
 			__asm
@@ -293,4 +252,34 @@ namespace tml
 	}
 
 	ThiscallToStdcallWrapper(MyUninitUnit)
+
+
+	// 本模块初始化
+
+	InlineHook g_onInitHook((void*)0x4719B0, MyOnInitWrapper, 11);
+	InlineHook g_onUninitHook((void*)0x471CB8, MyOnUninitWrapper);
+	InlineHook g_onReadResourceHook((void*)0x402E0C, MyReadResWrapper, 6);
+	InlineHook g_onInsertStruct2ToStruct1Hook((void*)0x401390, MyInsertStruct2ToStruct1, 9);
+	InlineHook g_onInsertStruct2ToStruct1RenHook((void*)0x401440, MyInsertStruct2ToStruct1Ren, 9);
+	InlineHook g_onDeleteStruct2Hook((void*)0x4018A0, MyDeleteStruct2Wrapper, 6);
+	InlineHook g_onInitStageHook((void*)0x426A00, MyInitStage, 7);
+	InlineHook g_onUninitStageHook((void*)0x426820, MyUninitStage);
+	InlineHook g_onInitUnitHook((void*)0x426050, MyInitUnitWrapper);
+	InlineHook g_onUninitUnitHook((void*)0x425330, MyUninitUnitWrapper, 6);
+
+	bool THInit::IsReady()
+	{
+		bool res = true;
+		res = res && g_onInitHook.IsEnabled();
+		res = res && g_onUninitHook.IsEnabled();
+		res = res && g_onReadResourceHook.IsEnabled();
+		res = res && g_onInsertStruct2ToStruct1Hook.IsEnabled();
+		res = res && g_onInsertStruct2ToStruct1RenHook.IsEnabled();
+		res = res && g_onDeleteStruct2Hook.IsEnabled();
+		res = res && g_onInitStageHook.IsEnabled();
+		res = res && g_onUninitStageHook.IsEnabled();
+		res = res && g_onInitUnitHook.IsEnabled();
+		res = res && g_onUninitUnitHook.IsEnabled();
+		return res;
+	}
 }

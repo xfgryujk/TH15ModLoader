@@ -95,9 +95,13 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="THFunction.h" />
-    <ClInclude Include="THInit.h" />
+    <ClInclude Include="THInitEvent.h" />
     <ClInclude Include="ModEvent.h" />
-    <ClInclude Include="THInit_.h" />
+    <ClInclude Include="THInit.h" />
+    <ClInclude Include="THInitHook.h" />
+    <ClInclude Include="THLogic.h" />
+    <ClInclude Include="THLogicEvent.h" />
+    <ClInclude Include="THLogicHook.h" />
     <ClInclude Include="THType.h" />
   </ItemGroup>
   <ItemGroup>
@@ -119,6 +123,7 @@
     <ClCompile Include="THFunction.cpp" />
     <ClCompile Include="THInit.cpp" />
     <ClCompile Include="ModEvent.cpp" />
+    <ClCompile Include="THLogic.cpp" />
     <ClCompile Include="THType.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
