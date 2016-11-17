@@ -4,7 +4,9 @@
 #include "APIHeader.h"
 
 struct IDirect3D9;
-struct IDirect3DDevice9;
+struct IDirect3DDevice9; 
+struct IDirectInputA;
+struct IDirectInputDeviceA;
 
 
 namespace THAPI
@@ -97,7 +99,7 @@ namespace THAPI
 	// ECL执行环境
 	struct EclContext // size = 0x11E8
 	{
-		float nextTime;				// ECL执行到这个时间停止
+		float time;					// 每帧一直执行ECL直到EclContext.time < Ins.time，Ins23实际会减少EclContext.time
 		DWORD eclFuncIndex;			// 当前在执行EclManager中哪个函数
 		DWORD insOffset;			// 当前ins偏移量，相对于ECL函数头"ECLH"+16的位置
 		BYTE stack[4096];			// ECL栈储存区
@@ -121,11 +123,45 @@ namespace THAPI
 		int args[1];			// 可能是int或float，实际有多少个参数看argCount
 	};
 
-	struct BulletGenPoint
+	struct Vec3
 	{
 		float x;
 		float y;
 		float z;
+	};
+
+	struct Position // size = 0x44
+	{
+		float x;
+		float y;
+		float z;
+		DWORD unknown1;
+		DWORD flag;
+		DWORD unknown2;
+		float angularVelocity;		// angle速度或直角坐标速度大小
+		float angle;				// 极坐标角度或方向
+		float radius;
+		float radiusVelocity;		// radius速度
+		float axisRotation;			// 坐标轴旋转角度，用于椭圆运动
+		float zoomRatio;			// 旋转后X轴缩放比，用于椭圆运动
+		DWORD unknown6;
+		DWORD unknown7;
+		DWORD unknown8;
+
+		// 速度或原点坐标
+
+		float movingArgX;
+		float movingArgY;
+		float movingArgZ;
+
+		/*
+		0直线，1静止，2圆，3椭圆，4未知
+		=0时以angle和angularVelocity计算movingArgXYZ，然后xyz加上movingArgXYZ
+		=2时以movingArgXYZ为原点，以angle、radius为极坐标计算xyz
+		=3时先按圆计算，再把坐标轴旋转axisRotation后，X轴缩放zoomRatio倍，再映射回原坐标轴得到xyz
+		*/
+		DWORD movingMode : 4;
+		DWORD padding : 28;
 	};
 
 	struct Danmaku // size = 0x380
@@ -142,7 +178,14 @@ namespace THAPI
 	// 储存了坐标、弹幕等
 	struct Enemy // size = 0x4530
 	{
-		BYTE unknown1[43];
+		float lastFinalX;
+		float lastFinalY;
+		float lastFinalZ;
+		BYTE unknown1[40];
+		float lastDeltaX;
+		float lastDeltaY;
+		float lastDeltaZ;
+		DWORD unknown16;
 		float finalX;				// 实际坐标 = 绝对坐标 + 相对坐标
 		float finalY;
 		float finalZ;
@@ -151,34 +194,29 @@ namespace THAPI
 		float deltaY;
 		float deltaZ;
 		DWORD unknown3;
-		float absoluteX;			// 绝对坐标
-		float absoluteY;
-		float absoluteZ;
-		DWORD unknown4;
-		DWORD flag1;
-		BYTE unknown5[30];
-		float relativeX;			// 相对坐标
-		float relativeY;
-		float relativeZ;
-		BYTE unknown6[56];
+		Position absolutePos;		// 绝对坐标
+		Position relativePos;		// 相对坐标
 		float HitBoxWidth;			// 被弹判定
 		float HitBoxHeight;
 		float BoundingBoxWidth;		// 体术判定
 		float BoundingBoxHeight;
-		BYTE unknown7[1144];
+		DWORD unknown17;
+		DWORD unknown18[16];
+		BYTE unknown7[1076];
 		Danmaku danmakus[16];
 		DWORD unknown8[16];
-		BulletGenPoint RelativeBulletGenPoints[16]; // 相对发弹点
-		BulletGenPoint AbsoluteBulletGenPoints[16]; // 绝对发弹点
-		BYTE unknown9[8];
+		Vec3 RelativeBulletGenPoints[16]; // 相对发弹点
+		Vec3 AbsoluteBulletGenPoints[16]; // 绝对发弹点
+		float Width;
+		float Height;
 		float boundCenterX;			// 移动范围限制
 		float boundCenterY;
 		float boundWidth;
 		float boundHeight;
 		DWORD unknown10;
-		DWORD life1;				// 赋值了这3个，暂时不知道各个的意义
-		DWORD life2;
-		DWORD life3;
+		DWORD life;
+		DWORD maxLife;
+		DWORD life3;				// 暂时未知
 		DWORD lifeMul7;				// life乘7？
 		BYTE unknown11[12];
 		DWORD baseDropItemType;		// 基础掉落
@@ -217,7 +255,9 @@ namespace THAPI
 	// 全局变量
 
 	extern TML_API IDirect3D9*& g_pD3D;
-	extern TML_API IDirect3DDevice9*& g_pDevice;
+	extern TML_API IDirect3DDevice9*& g_pD3DDevice;
+	extern TML_API IDirectInputA*& g_pDInput;
+	extern TML_API IDirectInputDeviceA*& g_pDInputDevice;
 
 	extern TML_API HWND& g_hMainWnd;
 	extern TML_API HINSTANCE& g_hInstance;
@@ -225,6 +265,9 @@ namespace THAPI
 	extern TML_API Struct1*& g_pStruct1;
 	extern TML_API Stage*& g_pStage;
 
+	extern TML_API float& g_ticksPerFrame;			// 用来控制游戏速度
+	
+	extern TML_API DWORD& g_playerInputFlag;		// 当前用户输入了哪些键，在0x401F50这个函数设定，被order=1的Struct2调用
 	extern TML_API int& g_playerLife;
 	extern TML_API int& g_playerBomb;
 }
