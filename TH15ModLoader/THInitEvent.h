@@ -68,11 +68,12 @@ namespace tml
 		InitUnitEvent(LPCSTR eclFuncName, void* pArg);
 	};
 
-	class TML_API UnitEvent final : public EventBase
+	class TML_API UnitEvent : public EventBase
 	{
 	public:
 		THAPI::Unit& m_unit;
 
 		UnitEvent(THAPI::Unit& unit);
+		virtual ~UnitEvent() = default;
 	};
 }

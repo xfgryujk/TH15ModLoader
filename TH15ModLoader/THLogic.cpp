@@ -43,14 +43,54 @@ namespace tml
 	}
 
 
+	// UnitResultEvent
+
+	UnitResultEvent::UnitResultEvent(Unit& unit) : 
+		UnitEvent(unit) { }
+
+	// 准备执行单位逻辑
+
+	int __fastcall MyOnUpdateUnit(Unit* pUnit)
+	{
+		UnitResultEvent event_(*pUnit);
+		if (g_eventBus.Post(THLogicEvent::OnUpdateUnit, event_))
+			return ((int(__fastcall*)(Unit* pUnit))g_onOnUpdateUnitHook.m_newEntry)(pUnit);
+		return event_.result;
+	}
+
+	// EclContextEvent
+
+	EclContextEvent::EclContextEvent(EclContext& eclContext) : 
+		UnitResultEvent(*eclContext.pUnit), m_eclContext(eclContext) { }
+
+	// 准备执行ECL逻辑
+
+	int __fastcall MyOnUpdateEclContext(EclContext* pEclContext)
+	{
+		float deltaTime;
+		__asm movss deltaTime, xmm1
+		EclContextEvent event_(*pEclContext);
+		if (g_eventBus.Post(THLogicEvent::OnUpdateEclContext, event_))
+		{
+			__asm movss xmm1, deltaTime
+			return ((int(__fastcall*)(EclContext* pEclContext))g_onOnUpdateEclContextHook.m_newEntry)(pEclContext);
+		}
+		return event_.result;
+	}
+
+
 	// 本模块初始化
 
 	InlineHook g_onCallStruct2Hook((void*)0x40155F, MyOnCallStruct2Wrapper, 6);
+	InlineHook g_onOnUpdateUnitHook((void*)0x428830, MyOnUpdateUnit);
+	InlineHook g_onOnUpdateEclContextHook((void*)0x48CA80, MyOnUpdateEclContext, 6);
 
 	bool THLogic::IsReady()
 	{
 		bool res = true;
 		res = res && g_onCallStruct2Hook.IsEnabled();
+		res = res && g_onOnUpdateUnitHook.IsEnabled();
+		res = res && g_onOnUpdateEclContextHook.IsEnabled();
 		return res;
 	}
 }
