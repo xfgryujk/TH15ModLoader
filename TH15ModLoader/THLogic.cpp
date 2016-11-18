@@ -78,12 +78,59 @@ namespace tml
 		return event_.result;
 	}
 
+	// InsEvent
+
+	InsEvent::InsEvent(EclContext& eclContext, Ins& ins) :
+		EclContextEvent(eclContext), m_ins(ins) { }
+
+	// 准备执行一条ECL指令
+
+	int __stdcall MyOnExecuteEclIns(EclContext* pEclContext, Ins* pIns)
+	{
+		InsEvent event_(*pEclContext, *pIns);
+		if (g_eventBus.Post(THLogicEvent::OnExecuteEclIns, event_))
+			event_.result = 0;
+		else if (event_.result == 0) // 取消但不清除EclContext
+			event_.result = 1;
+		else // 取消，清除EclContext
+			event_.result = 2;
+		return event_.result;
+	}
+
+	__declspec(naked) void MyOnExecuteEclInsWrapper()
+	{
+		__asm
+		{
+			push esi
+			push edi
+			call MyOnExecuteEclIns
+			test eax, eax
+			jnz Cancel
+			// 没取消，交给原函数
+			jmp g_onOnExecuteEclInsHook.m_newEntry
+
+			// 取消了
+			Cancel:
+			cmp eax, 1
+			jne Clear
+			// 不清除EclContext，跳到下一条ins
+			mov eax, 48E43Ah
+			jmp eax
+
+			// 清除EclContext
+			Clear:
+			mov eax, 48CB8Ch
+			jmp eax
+		}
+	}
+
 
 	// 本模块初始化
 
 	InlineHook g_onCallStruct2Hook((void*)0x40155F, MyOnCallStruct2Wrapper, 6);
 	InlineHook g_onOnUpdateUnitHook((void*)0x428830, MyOnUpdateUnit);
 	InlineHook g_onOnUpdateEclContextHook((void*)0x48CA80, MyOnUpdateEclContext, 6);
+	InlineHook g_onOnExecuteEclInsHook((void*)0x48CAFF, MyOnExecuteEclInsWrapper, 7);
 
 	bool THLogic::IsReady()
 	{
@@ -91,6 +138,7 @@ namespace tml
 		res = res && g_onCallStruct2Hook.IsEnabled();
 		res = res && g_onOnUpdateUnitHook.IsEnabled();
 		res = res && g_onOnUpdateEclContextHook.IsEnabled();
+		res = res && g_onOnExecuteEclInsHook.IsEnabled();
 		return res;
 	}
 }

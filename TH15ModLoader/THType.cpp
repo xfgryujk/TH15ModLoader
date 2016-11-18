@@ -4,20 +4,36 @@
 
 namespace THAPI
 {
-	TML_API IDirect3D9*& g_pD3D = *(IDirect3D9**)0x4E77D4;
-	TML_API IDirect3DDevice9*& g_pDevice = *(IDirect3DDevice9**)0x4E77D8;
-	TML_API IDirectInputA*& g_pDInput = *(IDirectInputA**)0x4E77DC;
-	TML_API IDirectInputDeviceA*& g_pDInputDevice = *(IDirectInputDeviceA**)0x44E77F0;
+#define DEF_TH_VARIABLE_T(type, name, address) TML_API decltype(name) name = *(type*)address
+#define DEF_TH_VARIABLE(name, address) DEF_TH_VARIABLE_T(decltype(name + 0), name, address)
 
-	TML_API HWND& g_hMainWnd = *(HWND*)0x519BB0;
-	TML_API HINSTANCE& g_hInstance = *(HINSTANCE*)0x519BB4;
 
-	TML_API Struct1*& g_pStruct1 = *(Struct1**)0x4E9A54;
-	TML_API Stage*& g_pStage = *(Stage**)0x4E9A80;
+	DEF_TH_VARIABLE_T(IDirect3D9*, g_pD3D, 0x4E77D4);
+	DEF_TH_VARIABLE_T(IDirect3DDevice9*, g_pD3DDevice, 0x4E77D8);
+	DEF_TH_VARIABLE_T(IDirectInputA*, g_pDInput, 0x4E77DC);
+	DEF_TH_VARIABLE_T(IDirectInputDeviceA*, g_pDInputDevice, 0x44E77F0);
 
-	TML_API float& g_ticksPerFrame = *(float*)0x4E73E8;
+	DEF_TH_VARIABLE(g_hMainWnd, 0x519BB0);
+	DEF_TH_VARIABLE(g_hInstance, 0x519BB4);
 
-	TML_API DWORD& g_playerInputFlag = *(DWORD*)0x4E6D10;
-	TML_API int& g_playerLife = *(int*)0x4E7450;
-	TML_API int& g_playerBomb = *(int*)0x4E745C;
+	DEF_TH_VARIABLE(g_pStruct1, 0x4E9A54);
+	DEF_TH_VARIABLE(g_pStage, 0x4E9A80);
+
+	DEF_TH_VARIABLE(g_ticksPerFrame, 0x4E73E8);
+
+	DEF_TH_VARIABLE(g_pressedButton, 0x4E6D10);
+	DEF_TH_VARIABLE(g_lastPressedButton, 0x4E6D14);
+	DEF_TH_VARIABLE(g_longPressedButton, 0x4E6D18);
+	DEF_TH_VARIABLE(g_newPressedButton, 0x4E6D1C);
+	DEF_TH_VARIABLE(g_newReleasedButton, 0x4E6D20);
+
+	DEF_TH_VARIABLE(g_playerScore, 0x4E740C);
+	DEF_TH_VARIABLE(g_playerMaxGetPoint, 0x4E7434);
+	DEF_TH_VARIABLE(g_playerLife, 0x4E7450);
+	DEF_TH_VARIABLE(g_playerLifePiece, 0x4E7454);
+	DEF_TH_VARIABLE(g_playerBomb, 0x4E745C);
+	DEF_TH_VARIABLE(g_playerBombPiece, 0x4E7460);
+	DEF_TH_VARIABLE(g_playerPower, 0x4E7440);
+	DEF_TH_VARIABLE(g_playerMaxPower, 0x4E7444);
+	DEF_TH_VARIABLE(g_playerMinPower, 0x4E7448);
 }

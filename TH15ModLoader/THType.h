@@ -60,9 +60,9 @@ namespace THAPI
 	{
 		DWORD order;					// 也可能是类型、图层？这个决定在链表中的顺序
 		DWORD flag;						// 已知没有0x2时不执行mainFunction，没有0x1时从Struct1断开后不free这个Struct2
-		void* mainFunction;				// 逻辑或渲染函数，thiscall，参数为param
-		void* onInsertToStruct1;		// 这个Struct2插入Struct1时执行，thiscall，参数为param
-		void* onLogicEnd;				// 在逻辑链表中有可能执行，没见执行过，thiscall，参数为param
+		int(__fastcall* mainFunction)(void* param);				// 逻辑或渲染函数，thiscall，参数为param
+		int(__fastcall* onInsertToStruct1)(void* param);		// 这个Struct2插入Struct1时执行，thiscall，参数为param
+		int(__fastcall* onLogicEnd)(void* param);				// 在逻辑链表中有可能执行，没见执行过，thiscall，参数为param
 		LinkNode<Struct2> linkNode;
 		void* param;					// 逻辑链中order为26时是g_pStage
 	};
@@ -100,14 +100,16 @@ namespace THAPI
 	struct EclContext // size = 0x11E8
 	{
 		float time;					// 每帧一直执行ECL直到EclContext.time < Ins.time，Ins23实际会减少EclContext.time
-		DWORD eclFuncIndex;			// 当前在执行EclManager中哪个函数
+		int eclFuncIndex;			// 当前在执行EclManager中哪个函数，-1说明未找到或已执行完
 		DWORD insOffset;			// 当前ins偏移量，相对于ECL函数头"ECLH"+16的位置
 		BYTE stack[4096];			// ECL栈储存区
 		DWORD stackTopOffset;		// 栈中下一个储存位置
 		DWORD varOffset;			// 栈中局部变量的位置
 		DWORD unknown1;
 		Unit* pUnit;
-		BYTE unknown2[460];
+		DWORD unknown2;
+		BYTE executeInsFlag;		// 与Ins.flag与运算后决定是否执行这条指令，一般为0x2
+		BYTE unknown3[455];
 	};
 
 	// 一条ECL指令
@@ -117,10 +119,22 @@ namespace THAPI
 		WORD code;				// 指令号
 		WORD size;				// 这个ins结构的大小
 		WORD isRefArgFlag;		// 第几位为1代表第几个参数是变量引用
-		BYTE flag;				// 一般为0xFF，与EclContext某成员与运算后决定是否执行这条指令，某成员一般为0x2
+		BYTE flag;				// 一般为0xFF，与EclContext.executeInsFlag与运算后决定是否执行这条指令
 		BYTE argCount;			// 参数数
 		DWORD usedStackSize;	// 一般为0，执行完这条ins后栈顶指针减去这个数
 		int args[1];			// 可能是int或float，实际有多少个参数看argCount
+	};
+
+	struct InitUnitArg // size = 0x54
+	{
+		float x;
+		float y;
+		float z;
+		int score;
+		DWORD baseDropItemType;
+		int maxLife;
+		DWORD xMirrorFlag;			// 左右镜像
+		BYTE unknown[56];
 	};
 
 	struct Vec3
@@ -213,11 +227,11 @@ namespace THAPI
 		float boundCenterY;
 		float boundWidth;
 		float boundHeight;
-		DWORD unknown10;
-		DWORD life;
-		DWORD maxLife;
-		DWORD life3;				// 暂时未知
-		DWORD lifeMul7;				// life乘7？
+		int score;
+		int life;
+		int maxLife;
+		int life3;					// 暂时未知
+		int lifeMul7;				// life乘7？
 		BYTE unknown11[12];
 		DWORD baseDropItemType;		// 基础掉落
 		DWORD dropItemCount[16];	// 索引是类型
@@ -262,12 +276,24 @@ namespace THAPI
 	extern TML_API HWND& g_hMainWnd;
 	extern TML_API HINSTANCE& g_hInstance;
 
-	extern TML_API Struct1*& g_pStruct1;
-	extern TML_API Stage*& g_pStage;
+	extern TML_API Struct1*& g_pStruct1;			// 储存逻辑链表和渲染链表，每帧被遍历调用
+	extern TML_API Stage*& g_pStage;				// 每个关卡初始化一次的全局变量
 
 	extern TML_API float& g_ticksPerFrame;			// 用来控制游戏速度
 	
-	extern TML_API DWORD& g_playerInputFlag;		// 当前用户输入了哪些键，在0x401F50这个函数设定，被order=1的Struct2调用
+	extern TML_API DWORD& g_pressedButton;			// 这一帧玩家按下了哪些键，在0x401F50这个函数设定，被order=1的Struct2调用
+	extern TML_API DWORD& g_lastPressedButton;		// 上一帧玩家按下了哪些键
+	extern TML_API DWORD& g_longPressedButton;		// 被长按的键
+	extern TML_API DWORD& g_newPressedButton;		// 这一帧新按下的键
+	extern TML_API DWORD& g_newReleasedButton;		// 这一帧新放开的键
+
+	extern TML_API int& g_playerScore;
+	extern TML_API int& g_playerMaxGetPoint;		// 最大得点
 	extern TML_API int& g_playerLife;
+	extern TML_API int& g_playerLifePiece;
 	extern TML_API int& g_playerBomb;
+	extern TML_API int& g_playerBombPiece;
+	extern TML_API int& g_playerPower;				// 100-400
+	extern TML_API const int& g_playerMaxPower;		// 400
+	extern TML_API const int& g_playerMinPower;		// 100
 }

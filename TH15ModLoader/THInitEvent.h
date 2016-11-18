@@ -63,9 +63,9 @@ namespace tml
 		// 单位执行的ECL函数名
 		const LPCSTR m_eclFuncName;
 		// 单位初始化用的参数
-		void* const m_pArg;
+		THAPI::InitUnitArg& m_arg;
 
-		InitUnitEvent(LPCSTR eclFuncName, void* pArg);
+		InitUnitEvent(LPCSTR eclFuncName, THAPI::InitUnitArg& arg);
 	};
 
 	class TML_API UnitEvent : public EventBase

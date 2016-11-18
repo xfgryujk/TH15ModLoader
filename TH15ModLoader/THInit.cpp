@@ -126,11 +126,11 @@ namespace tml
 	{
 		_RPTF2(_CRT_WARN, "插入Struct2到Struct1 (0x%X, %u)\n", pStruct2, order);
 
-		int res = 1; // 返回非0代表插入失败
+		int result = 1; // 返回非0代表插入失败
 		Struct2Event event_(*pStruct2, order);
 		if (g_eventBus.Post(THInitEvent::OnInsertStruct2ToStruct1, event_))
-			res = ((int(__stdcall*)(Struct2* pStruct2, DWORD order))g_onInsertStruct2ToStruct1Hook.m_newEntry)(pStruct2, order);
-		return res;
+			result = InsertStruct2ToStruct1(pStruct2, order);
+		return result;
 	}
 
 	// Struct2插入Struct1_Ren
@@ -139,29 +139,22 @@ namespace tml
 	{
 		_RPTF2(_CRT_WARN, "插入Struct2到Struct1Ren (0x%X, %u)\n", pStruct2, order);
 
-		int res = 1; // 返回非0代表插入失败
+		int result = 1; // 返回非0代表插入失败
 		Struct2Event event_(*pStruct2, order);
 		if (g_eventBus.Post(THInitEvent::OnInsertStruct2ToStruct1Ren, event_))
-			res = ((int(__stdcall*)(Struct2* pStruct2, DWORD order))g_onInsertStruct2ToStruct1RenHook.m_newEntry)(pStruct2, order);
-		return res;
+			result = InsertStruct2ToStruct1Ren(pStruct2, order);
+		return result;
 	}
 
 	// Struct2准备断开和析构
 
-	void __stdcall MyDeleteStruct2(Struct2* pStruct1, Struct2* pStruct2)
+	void __stdcall MyDeleteStruct2(Struct1* pStruct1, Struct2* pStruct2)
 	{
 		_RPTF2(_CRT_WARN, "删除Struct2 (0x%X, %u)\n", pStruct2, pStruct2->order);
 
 		Struct2Event event_(*pStruct2, pStruct2->order);
 		if (g_eventBus.Post(THInitEvent::OnDeleteStruct2, event_))
-		{
-			__asm
-			{
-				push pStruct2
-				mov ecx, pStruct1
-				call g_onDeleteStruct2Hook.m_newEntry
-			}
-		}
+			DeleteStruct2(pStruct1, pStruct2);
 	}
 
 	ThiscallToStdcallWrapper(MyDeleteStruct2)
@@ -194,28 +187,18 @@ namespace tml
 
 	// InitUnitEvent
 
-	InitUnitEvent::InitUnitEvent(LPCSTR eclFuncName, void* pArg) :
-		m_eclFuncName(eclFuncName), m_pArg(pArg) { }
+	InitUnitEvent::InitUnitEvent(LPCSTR eclFuncName, InitUnitArg& arg) :
+		m_eclFuncName(eclFuncName), m_arg(arg) { }
 
 	// 准备初始化单位
 
-	Unit* __stdcall MyInitUnit(Stage* pStage, const char* eclFuncName, void* pArg, DWORD unknown)
+	Unit* __stdcall MyInitUnit(Stage* pStage, const char* eclFuncName, InitUnitArg* pArg, DWORD unused)
 	{
-		Unit* res = NULL;
-		InitUnitEvent event_(eclFuncName, pArg);
+		Unit* result = NULL;
+		InitUnitEvent event_(eclFuncName, *pArg);
 		if (g_eventBus.Post(THInitEvent::OnInitUnit, event_))
-		{
-			__asm
-			{
-				push unknown
-				push pArg
-				push eclFuncName
-				mov ecx, pStage
-				call g_onInitUnitHook.m_newEntry
-				mov res, eax
-			}
-		}
-		return res;
+			result = CreateUnit(pStage, eclFuncName, pArg, unused);
+		return result;
 	}
 
 	ThiscallToStdcallWrapper(MyInitUnit)
@@ -231,14 +214,7 @@ namespace tml
 	{
 		UnitEvent event_(*pUnit);
 		if (g_eventBus.Post(THInitEvent::OnUninitUnit, event_))
-		{
-			__asm
-			{
-				push bFree
-				mov ecx, pUnit
-				call g_onUninitUnitHook.m_newEntry
-			}
-		}
+			DeleteUnit(pUnit, bFree);
 		return pUnit;
 	}
 
