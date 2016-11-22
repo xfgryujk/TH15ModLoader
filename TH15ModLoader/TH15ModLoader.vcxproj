@@ -102,6 +102,9 @@
     <ClInclude Include="THLogic.h" />
     <ClInclude Include="THLogicEvent.h" />
     <ClInclude Include="THLogicHook.h" />
+    <ClInclude Include="THRender.h" />
+    <ClInclude Include="THRenderEvent.h" />
+    <ClInclude Include="THRenderHook.h" />
     <ClInclude Include="THType.h" />
     <ClInclude Include="TMLModule.h" />
   </ItemGroup>
@@ -125,6 +128,7 @@
     <ClCompile Include="THInit.cpp" />
     <ClCompile Include="ModEvent.cpp" />
     <ClCompile Include="THLogic.cpp" />
+    <ClCompile Include="THRender.cpp" />
     <ClCompile Include="THType.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

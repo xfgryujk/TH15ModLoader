@@ -19,15 +19,18 @@
     <Filter Include="源文件\API">
       <UniqueIdentifier>{6ee276de-286b-47f4-83c9-23d7361ccbd4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\TMLModule">
+      <UniqueIdentifier>{4e2ba009-fe8e-4e4b-bb75-b65915971afd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\TMLModule">
+      <UniqueIdentifier>{3e41f691-a4c3-4b86-be23-7d6e6324eb3a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DllHijack.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Hook.h">
@@ -51,23 +54,35 @@
     <ClInclude Include="THInitEvent.h">
       <Filter>头文件\API</Filter>
     </ClInclude>
-    <ClInclude Include="THInit.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="THInitHook.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="THLogicEvent.h">
       <Filter>头文件\API</Filter>
     </ClInclude>
-    <ClInclude Include="THLogic.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="THLogicHook.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="THRenderEvent.h">
+      <Filter>头文件\API</Filter>
     </ClInclude>
     <ClInclude Include="TMLModule.h">
-      <Filter>头文件</Filter>
+      <Filter>头文件\TMLModule</Filter>
+    </ClInclude>
+    <ClInclude Include="THInit.h">
+      <Filter>头文件\TMLModule</Filter>
+    </ClInclude>
+    <ClInclude Include="THInitHook.h">
+      <Filter>头文件\TMLModule</Filter>
+    </ClInclude>
+    <ClInclude Include="THLogic.h">
+      <Filter>头文件\TMLModule</Filter>
+    </ClInclude>
+    <ClInclude Include="THLogicHook.h">
+      <Filter>头文件\TMLModule</Filter>
+    </ClInclude>
+    <ClInclude Include="THRender.h">
+      <Filter>头文件\TMLModule</Filter>
+    </ClInclude>
+    <ClInclude Include="DllHijack.h">
+      <Filter>头文件\TMLModule</Filter>
+    </ClInclude>
+    <ClInclude Include="THRenderHook.h">
+      <Filter>头文件\TMLModule</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -77,17 +92,11 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="DllHijack.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Hook.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ModManager.cpp">
       <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="THInit.cpp">
-      <Filter>源文件\API</Filter>
     </ClCompile>
     <ClCompile Include="ModEvent.cpp">
       <Filter>源文件\API</Filter>
@@ -99,7 +108,16 @@
       <Filter>源文件\API</Filter>
     </ClCompile>
     <ClCompile Include="THLogic.cpp">
-      <Filter>源文件\API</Filter>
+      <Filter>源文件\TMLModule</Filter>
+    </ClCompile>
+    <ClCompile Include="THInit.cpp">
+      <Filter>源文件\TMLModule</Filter>
+    </ClCompile>
+    <ClCompile Include="DllHijack.cpp">
+      <Filter>源文件\TMLModule</Filter>
+    </ClCompile>
+    <ClCompile Include="THRender.cpp">
+      <Filter>源文件\TMLModule</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

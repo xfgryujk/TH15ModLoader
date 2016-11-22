@@ -3,6 +3,7 @@
 #include "DllHijack.h"
 #include "THInit.h"
 #include "THLogic.h"
+#include "THRender.h"
 #include "ModManager.h"
 using namespace tml;
 
@@ -21,6 +22,7 @@ namespace
 		InitModule(DllHijack)
 		InitModule(THInit)
 		InitModule(THLogic)
+		InitModule(THRender)
 		return true;
 	}
 }
