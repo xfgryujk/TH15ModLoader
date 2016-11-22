@@ -1,20 +1,13 @@
 ﻿#pragma once
+#include "TMLModule.h"
+
 
 namespace tml
 {
-	class THInit final
+	class THInit final : public Singleton<THInit>
 	{
-	private:
-		THInit() = default;
-		~THInit() = default;
-
+		DECL_SINGLETON(THInit);
 	public:
-		static THInit& GetInstance()
-		{
-			static THInit s_instance;
-			return s_instance;
-		}
-
 		bool IsReady();
 	};
 }

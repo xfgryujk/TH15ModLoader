@@ -294,6 +294,4 @@ namespace THAPI
 	extern TML_API int& g_playerBomb;
 	extern TML_API int& g_playerBombPiece;
 	extern TML_API int& g_playerPower;				// 100-400
-	extern TML_API const int& g_playerMaxPower;		// 400
-	extern TML_API const int& g_playerMinPower;		// 100
 }

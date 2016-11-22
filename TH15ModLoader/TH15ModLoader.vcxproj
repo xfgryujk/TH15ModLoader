@@ -103,6 +103,7 @@
     <ClInclude Include="THLogicEvent.h" />
     <ClInclude Include="THLogicHook.h" />
     <ClInclude Include="THType.h" />
+    <ClInclude Include="TMLModule.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DllHijack.cpp" />

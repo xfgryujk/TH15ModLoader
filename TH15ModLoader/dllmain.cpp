@@ -9,23 +9,18 @@ using namespace tml;
 
 namespace
 {
+#define InitModule(module) \
+	if (!module::GetInstance().IsReady()) \
+	{ \
+		MessageBox(NULL, #module "初始化失败！", "TML", MB_ICONERROR); \
+		return false; \
+	}
+
 	bool InitModules()
 	{
-		if (!DllHijack::GetInstance().IsReady())
-		{
-			MessageBox(NULL, "DllHijack初始化失败！", "TML", MB_ICONERROR);
-			return false;
-		}
-		if (!THInit::GetInstance().IsReady())
-		{
-			MessageBox(NULL, "THInit初始化失败！", "TML", MB_ICONERROR);
-			return false;
-		}
-		if (!THLogic::GetInstance().IsReady())
-		{
-			MessageBox(NULL, "THLogic初始化失败！", "TML", MB_ICONERROR);
-			return false;
-		}
+		InitModule(DllHijack)
+		InitModule(THInit)
+		InitModule(THLogic)
 		return true;
 	}
 }

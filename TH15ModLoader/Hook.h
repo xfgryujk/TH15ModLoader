@@ -25,7 +25,7 @@ namespace tml
 #define ThiscallToStdcallWrapper(f) \
 	__declspec(naked) void f##Wrapper() \
 	{ \
-		__asm pop eax\
+		__asm pop eax \
 		__asm push ecx \
 		__asm push eax \
 		__asm jmp f \

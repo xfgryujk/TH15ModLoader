@@ -34,6 +34,4 @@ namespace THAPI
 	DEF_TH_VARIABLE(g_playerBomb, 0x4E745C);
 	DEF_TH_VARIABLE(g_playerBombPiece, 0x4E7460);
 	DEF_TH_VARIABLE(g_playerPower, 0x4E7440);
-	DEF_TH_VARIABLE(g_playerMaxPower, 0x4E7444);
-	DEF_TH_VARIABLE(g_playerMinPower, 0x4E7448);
 }

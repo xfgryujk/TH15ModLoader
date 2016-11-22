@@ -1,9 +1,12 @@
 ﻿#pragma once
+#include "TMLModule.h"
+
 
 namespace tml
 {
-	class DllHijack final
+	class DllHijack final : public Singleton<DllHijack>
 	{
+		DECL_SINGLETON(DllHijack);
 	private:
 		HMODULE m_d3d9Module = NULL;
 
@@ -11,12 +14,6 @@ namespace tml
 		~DllHijack();
 
 	public:
-		static DllHijack& GetInstance()
-		{
-			static DllHijack s_instance;
-			return s_instance;
-		}
-
 		bool IsReady();
 	};
 }

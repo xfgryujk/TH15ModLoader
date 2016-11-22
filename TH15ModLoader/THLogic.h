@@ -1,20 +1,13 @@
 ﻿#pragma once
+#include "TMLModule.h"
+
 
 namespace tml
 {
-	class THLogic final
+	class THLogic final : public Singleton<THLogic>
 	{
-	private:
-		THLogic() = default;
-		~THLogic() = default;
-
+		DECL_SINGLETON(THLogic);
 	public:
-		static THLogic& GetInstance()
-		{
-			static THLogic s_instance;
-			return s_instance;
-		}
-
 		bool IsReady();
 	};
 }
