@@ -8,20 +8,20 @@ namespace tml
 {
 	enum THLogicEvent
 	{
-		OnCallStruct2 = 100,				// 准备调用逻辑链中Struct2的mainFunction，事件类型为CallStruct2Event，可取消
+		OnCallLogicModule = 100,			// 准备调用逻辑链中Module的mainFunction，事件类型为CallModuleEvent，可取消
 		OnUpdateUnit,						// 准备执行单位逻辑，事件类型为UnitEvent，可取消
 		OnUpdateEclContext,					// 准备执行ECL逻辑，事件类型为EclContextEvent，可取消
 		OnExecuteEclIns						// 准备执行一条ECL指令，事件类型为InsEvent，可取消
 	};
 
-	class TML_API CallStruct2Event final : public Struct2Event
+	class TML_API CallModuleEvent final : public ModuleEvent
 	{
 	public:
 		// 如果事件取消了则返回这个值
-		// 0清除这个Struct2，1遍历下一个Struct2，2再次调用这个Struct2，3458未知，6重新遍历所有Struct2，7结束遍历Struct2
+		// 0清除这个Module，1遍历下一个Module，2再次调用这个Module，3458未知，6重新遍历所有Module，7结束遍历Module
 		int result = 1;
 
-		CallStruct2Event(THAPI::Struct2& struct2);
+		CallModuleEvent(THAPI::Module& module);
 	};
 
 	class TML_API UnitResultEvent : public UnitEvent

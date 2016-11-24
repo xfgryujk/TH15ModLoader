@@ -115,49 +115,49 @@ namespace tml
 	}
 
 
-	// Struct2Event
+	// ModuleEvent
 
-	Struct2Event::Struct2Event(Struct2& struct2, DWORD order) :
-		m_struct2(struct2), m_order(order) { }
+	ModuleEvent::ModuleEvent(Module& module, DWORD order) :
+		m_module(module), m_order(order) { }
 
-	// Struct2插入Struct1
+	// Module插入逻辑链
 
-	int __stdcall MyInsertStruct2ToStruct1(Struct2* pStruct2, DWORD order)
+	int __stdcall MyInsertModuleToLogicLink(Module* pModule, DWORD order)
 	{
-		_RPTF2(_CRT_WARN, "插入Struct2到Struct1 (0x%X, %u)\n", pStruct2, order);
+		_RPTF2(_CRT_WARN, "插入Module到LogicLink (0x%X, %u)\n", pModule, order);
 
 		int result = 1; // 返回非0代表插入失败
-		Struct2Event event_(*pStruct2, order);
-		if (g_eventBus.Post(THInitEvent::OnInsertStruct2ToStruct1, event_))
-			result = InsertStruct2ToStruct1(pStruct2, order);
+		ModuleEvent event_(*pModule, order);
+		if (g_eventBus.Post(THInitEvent::OnInsertModuleToLogicLink, event_))
+			result = InsertModuleToLogicLink(pModule, order);
 		return result;
 	}
 
-	// Struct2插入Struct1_Ren
+	// Module插入渲染链
 
-	int __stdcall MyInsertStruct2ToStruct1Ren(Struct2* pStruct2, DWORD order)
+	int __stdcall MyInsertModuleToRenderLink(Module* pModule, DWORD order)
 	{
-		_RPTF2(_CRT_WARN, "插入Struct2到Struct1Ren (0x%X, %u)\n", pStruct2, order);
+		_RPTF2(_CRT_WARN, "插入Module到RenderLink (0x%X, %u)\n", pModule, order);
 
 		int result = 1; // 返回非0代表插入失败
-		Struct2Event event_(*pStruct2, order);
-		if (g_eventBus.Post(THInitEvent::OnInsertStruct2ToStruct1Ren, event_))
-			result = InsertStruct2ToStruct1Ren(pStruct2, order);
+		ModuleEvent event_(*pModule, order);
+		if (g_eventBus.Post(THInitEvent::OnInsertModuleToRenderLink, event_))
+			result = InsertModuleToRenderLink(pModule, order);
 		return result;
 	}
 
-	// Struct2准备断开和析构
+	// Module准备断开和析构
 
-	void __stdcall MyDeleteStruct2(Struct1* pStruct1, Struct2* pStruct2)
+	void __stdcall MyDeleteModule(ModulesLinks* pModulesLinks, Module* pModule)
 	{
-		_RPTF2(_CRT_WARN, "删除Struct2 (0x%X, %u)\n", pStruct2, pStruct2->order);
+		_RPTF2(_CRT_WARN, "删除Module (0x%X, %u)\n", pModule, pModule->order);
 
-		Struct2Event event_(*pStruct2, pStruct2->order);
-		if (g_eventBus.Post(THInitEvent::OnDeleteStruct2, event_))
-			DeleteStruct2(pStruct1, pStruct2);
+		ModuleEvent event_(*pModule, pModule->order);
+		if (g_eventBus.Post(THInitEvent::OnDeleteModule, event_))
+			DeleteModule(pModulesLinks, pModule);
 	}
 
-	ThiscallToStdcallWrapper(MyDeleteStruct2)
+	ThiscallToStdcallWrapper(MyDeleteModule)
 
 
 	// StageEvent
@@ -226,9 +226,9 @@ namespace tml
 	InlineHook g_onInitHook((void*)0x4719B0, MyOnInitWrapper, 11);
 	InlineHook g_onUninitHook((void*)0x471CB8, MyOnUninitWrapper);
 	InlineHook g_onReadResourceHook((void*)0x402E0C, MyReadResWrapper, 6);
-	InlineHook g_onInsertStruct2ToStruct1Hook((void*)0x401390, MyInsertStruct2ToStruct1, 9);
-	InlineHook g_onInsertStruct2ToStruct1RenHook((void*)0x401440, MyInsertStruct2ToStruct1Ren, 9);
-	InlineHook g_onDeleteStruct2Hook((void*)0x4018A0, MyDeleteStruct2Wrapper, 6);
+	InlineHook g_onInsertModuleToLogicLinkHook((void*)0x401390, MyInsertModuleToLogicLink, 9);
+	InlineHook g_onInsertModuleToRenderLinkHook((void*)0x401440, MyInsertModuleToRenderLink, 9);
+	InlineHook g_onDeleteModuleHook((void*)0x4018A0, MyDeleteModuleWrapper, 6);
 	InlineHook g_onInitStageHook((void*)0x426A00, MyInitStage, 7);
 	InlineHook g_onUninitStageHook((void*)0x426820, MyUninitStage);
 	InlineHook g_onInitUnitHook((void*)0x426050, MyInitUnitWrapper);
@@ -240,9 +240,9 @@ namespace tml
 		res = res && g_onInitHook.IsEnabled();
 		res = res && g_onUninitHook.IsEnabled();
 		res = res && g_onReadResourceHook.IsEnabled();
-		res = res && g_onInsertStruct2ToStruct1Hook.IsEnabled();
-		res = res && g_onInsertStruct2ToStruct1RenHook.IsEnabled();
-		res = res && g_onDeleteStruct2Hook.IsEnabled();
+		res = res && g_onInsertModuleToLogicLinkHook.IsEnabled();
+		res = res && g_onInsertModuleToRenderLinkHook.IsEnabled();
+		res = res && g_onDeleteModuleHook.IsEnabled();
 		res = res && g_onInitStageHook.IsEnabled();
 		res = res && g_onUninitStageHook.IsEnabled();
 		res = res && g_onInitUnitHook.IsEnabled();

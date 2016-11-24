@@ -11,7 +11,7 @@ struct IDirectInputDeviceA;
 
 namespace THAPI
 {
-	struct Struct2;
+	struct Module;
 	struct Stage;
 	struct EclManager;
 	struct Unit;
@@ -28,42 +28,35 @@ namespace THAPI
 		LinkNode* unknown; // 貌似和next一样
 	};
 
-	// 储存渲染链表，每帧被遍历调用
-	struct Struct1_Ren
+	struct ModulesLink // size = 0x28
 	{
-		DWORD unknown1;
+		DWORD unknown1; // 这里unknown成员都没被使用过
 		DWORD unknown2;
 		DWORD unknown3;
 		DWORD unknown4;
 		DWORD unknown5;
-		LinkNode<Struct2> firstRenderNode;
+		LinkNode<Module> firstLinkNode;
+		DWORD unknown6;
 	};
 
-	// 储存逻辑链表，每帧被遍历调用
-	struct Struct1 // size = 0x58
+	// 储存逻辑、渲染链表，每帧被遍历调用
+	struct ModulesLinks // size = 0x58
 	{
-		DWORD unknown1;
-		DWORD unknown2;
-		DWORD unknown3;
-		DWORD unknown4;
-		DWORD unknown5;
-		LinkNode<Struct2> firstLogicNode;
-		DWORD unknown6;
-		Struct1_Ren struct1Ren;
-		DWORD unknown7;
-		LinkNode<Struct2>* pNextNode;		// 遍历时候临时用，逻辑、渲染链都用到
-		DWORD unknown8;
+		ModulesLink logicLink;				// 逻辑链
+		ModulesLink renderLink;				// 渲染链
+		LinkNode<Module>* pNextNode;		// 遍历链表时临时储存下一个结点指针，逻辑、渲染链都用到
+		BOOL hasUninit;						// ModulesLinks析构时这个赋值1并调用logicLink
 	};
 
 	// 每帧被遍历时mainFunction被调用
-	struct Struct2 // size = 0x28
+	struct Module // size = 0x28
 	{
 		DWORD order;					// 也可能是类型、图层？这个决定在链表中的顺序
-		DWORD flag;						// 已知没有0x2时不执行mainFunction，没有0x1时从Struct1断开后不free这个Struct2
+		DWORD flag;						// 已知没有0x2时不执行mainFunction，没有0x1时从ModulesLinks断开后不free这个Module
 		int(__fastcall* mainFunction)(void* param);				// 逻辑或渲染函数，thiscall，参数为param
-		int(__fastcall* onInsertToStruct1)(void* param);		// 这个Struct2插入Struct1时执行，thiscall，参数为param
+		int(__fastcall* onInsertToModulesLinks)(void* param);	// 这个Module插入ModulesLinks时执行，thiscall，参数为param
 		int(__fastcall* onLogicEnd)(void* param);				// 在逻辑链表中有可能执行，没见执行过，thiscall，参数为param
-		LinkNode<Struct2> linkNode;
+		LinkNode<Module> linkNode;
 		void* param;					// 逻辑链中order为26时是g_pStage
 	};
 
@@ -71,8 +64,8 @@ namespace THAPI
 	struct Stage // size = 0x190
 	{
 		DWORD unknown1;
-		Struct2* pStruct2;
-		Struct2* pStruct2Ren;
+		Module* pLogicModule;
+		Module* pRenderModule;
 		BYTE unknown[368];
 		EclManager* pEclManager;
 		LinkNode<Unit>* pFirstUnitNode;
@@ -86,11 +79,11 @@ namespace THAPI
 	{
 		void* pVTable;
 		DWORD nNumberOfEclBufs;			// 读取的ECL文件数
-		DWORD nNumberOfFunctions;			// ECL函数数，包括include的
+		DWORD nNumberOfFunctions;		// ECL函数数，包括include的
 		BYTE* pEclBufs[32];				// 指向ECL文件buffer
 		struct
 		{
-			char* pName;
+			char* name;
 			BYTE* pBuf;					// 指向ECL函数头"ECLH"的地方
 		}* pFunctions;
 		BYTE unknown[4104];
@@ -276,12 +269,12 @@ namespace THAPI
 	extern TML_API HWND& g_hMainWnd;
 	extern TML_API HINSTANCE& g_hInstance;
 
-	extern TML_API Struct1*& g_pStruct1;			// 储存逻辑链表和渲染链表，每帧被遍历调用
+	extern TML_API ModulesLinks*& g_pModulesLinks;	// 储存逻辑链表和渲染链表，每帧被遍历调用
 	extern TML_API Stage*& g_pStage;				// 每个关卡初始化一次的全局变量
 
 	extern TML_API float& g_ticksPerFrame;			// 用来控制游戏速度
 	
-	extern TML_API DWORD& g_pressedButton;			// 这一帧玩家按下了哪些键，在0x401F50这个函数设定，被order=1的Struct2调用
+	extern TML_API DWORD& g_pressedButton;			// 这一帧玩家按下了哪些键，在0x401F50这个函数设定，被order=1的Module调用
 	extern TML_API DWORD& g_lastPressedButton;		// 上一帧玩家按下了哪些键
 	extern TML_API DWORD& g_longPressedButton;		// 被长按的键
 	extern TML_API DWORD& g_newPressedButton;		// 这一帧新按下的键

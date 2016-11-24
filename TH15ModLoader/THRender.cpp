@@ -7,28 +7,28 @@ using namespace THAPI;
 
 namespace tml
 {
-	// 准备调用渲染链中Struct2的mainFunction
+	// 准备调用渲染链中Module的mainFunction
 
-	int __stdcall MyOnCallStruct2Ren(Struct2* pStruct2)
+	int __stdcall MyOnCallRenderModule(Module* pModule)
 	{
-		CallStruct2Event event_(*pStruct2);
-		if (g_eventBus.Post(THRenderEvent::OnCallStruct2Ren, event_))
+		CallModuleEvent event_(*pModule);
+		if (g_eventBus.Post(THRenderEvent::OnCallRenderModule, event_))
 			event_.result = -1;
 		else if (event_.result == -1)
 			event_.result = 1;
 		return event_.result;
 	}
 
-	__declspec(naked) void MyOnCallStruct2RenWrapper()
+	__declspec(naked) void MyOnCallRenderModuleWrapper()
 	{
 		__asm
 		{
 			push edi
-			call MyOnCallStruct2Ren
+			call MyOnCallRenderModule
 			cmp eax, -1
 			jne Cancel
 			// 没取消，交给原函数
-			jmp g_onCallStruct2RenHook.m_newEntry
+			jmp g_onCallRenderModuleHook.m_newEntry
 
 			// 取消了，返回eax，跳过原函数
 			Cancel:
@@ -40,12 +40,12 @@ namespace tml
 
 	// 本模块初始化
 
-	InlineHook g_onCallStruct2RenHook((void*)0x40168A, MyOnCallStruct2RenWrapper, 6);
+	InlineHook g_onCallRenderModuleHook((void*)0x40168A, MyOnCallRenderModuleWrapper, 6);
 
 	bool THRender::IsReady()
 	{
 		bool res = true;
-		res = res && g_onCallStruct2RenHook.IsEnabled();
+		res = res && g_onCallRenderModuleHook.IsEnabled();
 		return res;
 	}
 }

@@ -3,5 +3,5 @@
 
 namespace tml
 {
-	extern InlineHook g_onCallStruct2RenHook;
+	extern InlineHook g_onCallRenderModuleHook;
 }

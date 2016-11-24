@@ -8,6 +8,6 @@ namespace tml
 {
 	enum THRenderEvent
 	{
-		OnCallStruct2Ren = 200				// 准备调用渲染链中Struct2的mainFunction，事件类型为CallStruct2Event，可取消
+		OnCallRenderModule = 200				// 准备调用渲染链中Module的mainFunction，事件类型为CallModuleEvent，可取消
 	};
 }

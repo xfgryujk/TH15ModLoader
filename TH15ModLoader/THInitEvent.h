@@ -9,12 +9,12 @@ namespace tml
 {
 	enum THInitEvent
 	{
-		OnInit = 0,						// 程序刚开始，Struct1和另一个尺寸为0x1CAF97C的对象初始化完成后
-		OnUninit,						// 程序准备结束，Struct1析构之前
+		OnInit = 0,						// 程序刚开始，ModulesLinks和另一个尺寸为0x1CAF97C的对象初始化完成后
+		OnUninit,						// 程序准备结束，ModulesLinks析构之前
 		OnReadResource,					// 读取资源，可替换资源，事件类型为ReadResourceEvent
-		OnInsertStruct2ToStruct1,		// 准备把某个Struct2插入Struct1，事件类型为Struct2Event，可取消
-		OnInsertStruct2ToStruct1Ren,	// 准备把某个Struct2插入Struct1_Ren，事件类型为Struct2Event，可取消
-		OnDeleteStruct2,				// 准备把某个Struct2从Struct1或Struct1_Ren断开和析构，事件类型为Struct2Event，可取消
+		OnInsertModuleToLogicLink,		// 准备把某个Module插入逻辑链，事件类型为ModuleEvent，可取消
+		OnInsertModuleToRenderLink,		// 准备把某个Module插入渲染链，事件类型为ModuleEvent，可取消
+		OnDeleteModule,					// 准备把某个Module从逻辑链或渲染链断开和析构，事件类型为ModuleEvent，可取消
 		OnInitStage,					// 关卡初始化后，事件类型为StageEvent
 		OnUninitStage,					// 准备析构关卡，事件类型为StageEvent
 		OnInitUnit,						// 准备初始化和插入单位到Stage，事件类型为InitUnitEvent，可取消
@@ -38,15 +38,15 @@ namespace tml
 		void SetResBuffer(void* buffer, size_t size);
 	};
 
-	class TML_API Struct2Event : public EventBase
+	class TML_API ModuleEvent : public EventBase
 	{
 	public:
-		THAPI::Struct2& m_struct2;
-		// 插入之前Struct2的order未初始化，应依赖这个判断
+		THAPI::Module& m_module;
+		// 插入之前Module的order未初始化，应依赖这个判断
 		const DWORD m_order;
 
-		Struct2Event(THAPI::Struct2& struct2, DWORD order);
-		virtual ~Struct2Event() = default;
+		ModuleEvent(THAPI::Module& module, DWORD order);
+		virtual ~ModuleEvent() = default;
 	};
 
 	class TML_API StageEvent final : public EventBase
