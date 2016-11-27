@@ -9,7 +9,7 @@ namespace tml
 {
 	enum THInitEvent
 	{
-		OnInit = 0,						// 程序刚开始，ModulesLinks和另一个尺寸为0x1CAF97C的对象初始化完成后
+		OnInit = 0,						// 程序刚开始，ModulesLinks和RenderEngine初始化完成后
 		OnUninit,						// 程序准备结束，ModulesLinks析构之前
 		OnReadResource,					// 读取资源，可替换资源，事件类型为ReadResourceEvent
 		OnInsertModuleToLogicLink,		// 准备把某个Module插入逻辑链，事件类型为ModuleEvent，可取消

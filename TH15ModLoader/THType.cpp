@@ -17,6 +17,7 @@ namespace THAPI
 	DEF_TH_VARIABLE(g_hInstance, 0x519BB4);
 
 	DEF_TH_VARIABLE(g_pModulesLinks, 0x4E9A54);
+	DEF_TH_VARIABLE(g_pRenderEngine, 0x503C18);
 	DEF_TH_VARIABLE(g_pStage, 0x4E9A80);
 
 	DEF_TH_VARIABLE(g_ticksPerFrame, 0x4E73E8);

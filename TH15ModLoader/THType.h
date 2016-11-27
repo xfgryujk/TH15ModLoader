@@ -7,6 +7,8 @@ struct IDirect3D9;
 struct IDirect3DDevice9; 
 struct IDirectInputA;
 struct IDirectInputDeviceA;
+struct IDirect3DTexture9;
+struct IDirect3DVertexBuffer9;
 
 
 namespace THAPI
@@ -16,9 +18,11 @@ namespace THAPI
 	struct EclManager;
 	struct Unit;
 
+#define CHECK_SIZE(T, size) static_assert(sizeof(T) == size, "Wrong size of " #T)
 
 #pragma pack(push)
 #pragma pack(1)
+
 	template<class T>
 	struct LinkNode
 	{
@@ -27,8 +31,9 @@ namespace THAPI
 		LinkNode* pPrev;
 		LinkNode* unknown; // 貌似和next一样
 	};
+	CHECK_SIZE(LinkNode<void>, 0x10);
 
-	struct ModulesLink // size = 0x28
+	struct ModulesLink
 	{
 		DWORD unknown1; // 这里unknown成员都没被使用过
 		DWORD unknown2;
@@ -38,18 +43,20 @@ namespace THAPI
 		LinkNode<Module> firstLinkNode;
 		DWORD unknown6;
 	};
+	CHECK_SIZE(ModulesLink, 0x28);
 
 	// 储存逻辑、渲染链表，每帧被遍历调用
-	struct ModulesLinks // size = 0x58
+	struct ModulesLinks
 	{
 		ModulesLink logicLink;				// 逻辑链
 		ModulesLink renderLink;				// 渲染链
 		LinkNode<Module>* pNextNode;		// 遍历链表时临时储存下一个结点指针，逻辑、渲染链都用到
 		BOOL hasUninit;						// ModulesLinks析构时这个赋值1并调用logicLink
 	};
+	CHECK_SIZE(ModulesLinks, 0x58);
 
 	// 每帧被遍历时mainFunction被调用
-	struct Module // size = 0x28
+	struct Module
 	{
 		DWORD order;					// 也可能是类型、图层？这个决定在链表中的顺序
 		DWORD flag;						// 已知没有0x2时不执行mainFunction，没有0x1时从ModulesLinks断开后不free这个Module
@@ -59,9 +66,11 @@ namespace THAPI
 		LinkNode<Module> linkNode;
 		void* param;					// 逻辑链中order为26时是g_pStage
 	};
+	CHECK_SIZE(Module, 0x28);
+
 
 	// 每个关卡初始化一次的全局变量
-	struct Stage // size = 0x190
+	struct Stage
 	{
 		DWORD unknown1;
 		Module* pLogicModule;
@@ -73,9 +82,10 @@ namespace THAPI
 		LinkNode<Unit>* pFirstUnitNode_;
 		DWORD nNumberOfUnits;
 	};
+	CHECK_SIZE(Stage, 0x190);
 
 	// 负责读取、储存ECL
-	struct EclManager // size = 0x1098
+	struct EclManager
 	{
 		void* pVTable;
 		DWORD nNumberOfEclBufs;			// 读取的ECL文件数
@@ -88,9 +98,10 @@ namespace THAPI
 		}* pFunctions;
 		BYTE unknown[4104];
 	};
+	CHECK_SIZE(EclManager, 0x1098);
 
 	// ECL执行环境
-	struct EclContext // size = 0x11E8
+	struct EclContext
 	{
 		float time;					// 每帧一直执行ECL直到EclContext.time < Ins.time，Ins23实际会减少EclContext.time
 		int eclFuncIndex;			// 当前在执行EclManager中哪个函数，-1说明未找到或已执行完
@@ -104,6 +115,7 @@ namespace THAPI
 		BYTE executeInsFlag;		// 与Ins.flag与运算后决定是否执行这条指令，一般为0x2
 		BYTE unknown3[455];
 	};
+	CHECK_SIZE(EclContext, 0x11E8);
 
 	// 一条ECL指令
 	struct Ins
@@ -118,7 +130,7 @@ namespace THAPI
 		int args[1];			// 可能是int或float，实际有多少个参数看argCount
 	};
 
-	struct InitUnitArg // size = 0x54
+	struct InitUnitArg
 	{
 		float x;
 		float y;
@@ -129,6 +141,7 @@ namespace THAPI
 		DWORD xMirrorFlag;			// 左右镜像
 		BYTE unknown[56];
 	};
+	CHECK_SIZE(InitUnitArg, 0x54);
 
 	struct Vec3
 	{
@@ -137,7 +150,7 @@ namespace THAPI
 		float z;
 	};
 
-	struct Position // size = 0x44
+	struct Position
 	{
 		float x;
 		float y;
@@ -151,9 +164,7 @@ namespace THAPI
 		float radiusVelocity;		// radius速度
 		float axisRotation;			// 坐标轴旋转角度，用于椭圆运动
 		float zoomRatio;			// 旋转后X轴缩放比，用于椭圆运动
-		DWORD unknown6;
-		DWORD unknown7;
-		DWORD unknown8;
+		DWORD unknown3;
 
 		// 速度或原点坐标
 
@@ -170,8 +181,9 @@ namespace THAPI
 		DWORD movingMode : 4;
 		DWORD padding : 28;
 	};
+	CHECK_SIZE(Position, 0x44);
 
-	struct Danmaku // size = 0x380
+	struct Danmaku
 	{
 		BYTE unknown1[20];
 		float direct;				// 方向
@@ -181,9 +193,10 @@ namespace THAPI
 		float bulletGenDist;		// 发弹点距离BOSS的距离？
 		BYTE unknown3[856];
 	};
+	CHECK_SIZE(Danmaku, 0x380);
 
 	// 储存了坐标、弹幕等
-	struct Enemy // size = 0x4530
+	struct Enemy
 	{
 		float lastFinalX;
 		float lastFinalY;
@@ -239,9 +252,10 @@ namespace THAPI
 		BYTE unknown15[112];
 		Enemy* thiz;
 	};
+	CHECK_SIZE(Enemy, 0x4530);
 
 	// 一个EclContext执行一个ECL函数，可以有多个EclContext并行，关卡初始化时第一个单位执行main函数
-	struct Unit // size = 0x574C
+	struct Unit
 	{
 		void* pVTable;							// =0x4CC2E8，第一个虚函数用来执行100以上的ins
 		DWORD unknown1;
@@ -256,6 +270,153 @@ namespace THAPI
 		DWORD unknown5;
 		DWORD unknown6;
 	};
+	CHECK_SIZE(Unit, 0x574C);
+
+
+	// 对应一个动画，也是ANM指令环境，执行一个script
+	struct AnmContext
+	{
+		BYTE unknown1[24];
+		DWORD renderMode;
+		DWORD renderFlag;
+		BYTE unknown2[8];
+		DWORD anmIndex;			// AnmManager索引
+		DWORD unknown3;
+		DWORD scriptIndex;		// AnmManager中script索引
+		DWORD insOffset;		// 当前ins偏移量
+		BYTE unknown4[932];
+		float matrix1[16]; //D3DXMATRIX matrix1;
+		float matrix2[16]; //D3DXMATRIX matrix2;
+		BYTE unknown5[232];
+		DWORD id;				// 低13位是anmCtxIndex，高位是总分配的AnmCtx数
+		DWORD anmCtxIndex;		// AnmCtx池索引
+		DWORD unknown6;
+		float time;				// 当前anm指令时间
+		BYTE unknown7[32];
+		LinkNode<AnmContext> linkNode;
+		BYTE unknown8[120];
+		float rotationX;
+		float rotationY;
+		float rotationZ;
+	};
+	CHECK_SIZE(AnmContext, 0x608);
+
+	// 对应一个ANM文件
+	struct AnmManager
+	{
+		DWORD index;
+		char name[260];
+		BYTE* pAnmBuf;					// ANM文件buffer
+		AnmContext* pAnmCtxPrototypes;	// AnmContext原型数组，新的AnmContext从这里拷贝，大小=scriptCount
+		DWORD imgCount;					// ANM文件中图片数
+		DWORD scriptCount;				// ANM文件中总script数
+		DWORD spriteCount;				// ANM文件中总sprite数
+		void* pSprites;					// 大小=spriteCount
+		BYTE** pScriptBufs;				// 指针数组，指向ANM指令开始的地方，大小=scriptCount
+		struct Img
+		{
+			IDirect3DTexture9* pTexture;
+			BYTE* pImgFileBuf;			// 外部图片文件的buffer
+			DWORD imgFileBufSize;
+			DWORD bytesPerPixel;
+			BYTE* pImgBufInAnmFile;		// ANM文件中储存的图片buffer
+			DWORD flag;
+		}* pImgs;						// 大小=imgCount
+		BYTE unknown[20];
+	};
+	CHECK_SIZE(AnmManager, 0x13C);
+
+	struct AnmCtxNode
+	{
+		AnmContext anmCtx;
+		LinkNode<AnmCtxNode> linkNode;
+		BYTE unknown;		// 可能是已被分配的flag
+		BYTE padding[3];
+		DWORD index;
+	};
+	CHECK_SIZE(AnmCtxNode, 0x620);
+
+	struct Vertex1
+	{
+		float x, y, z;
+		float specular, diffuse;
+		float tu, tv;
+	};
+
+	struct Vertex2
+	{
+		float x, y, z, rhw;
+		float diffuse;
+	};
+
+	// 储存渲染用的资源和状态
+	struct RenderEngine
+	{
+		void* pVTable;
+		BYTE unknown[28];
+		struct
+		{
+			DWORD anmIndex;
+			DWORD imgIndex;
+			DWORD srcX;
+			DWORD srcY;
+			DWORD srcWidth;
+			DWORD srcHeight;
+			DWORD dstX;
+			DWORD dstY;
+			DWORD dstWidth;
+			DWORD dstHeight;
+		} copyRenderResultArgs[4];			// 貌似会把每帧渲染结果拷贝？应该和截图有关
+		DWORD newBulletCount;				// 也可能不是子弹数，暂时这么叫...
+		DWORD unknown1;
+		DWORD setStateCount;				// 每帧开始=0，调用渲染函数时+1
+		DWORD drawCount;					// 每帧开始=0，调用渲染函数时+1
+		BYTE unknown2[20];
+		LinkNode<AnmCtxNode>* pAnmCtx1Link;
+		LinkNode<AnmCtxNode>* unknown3;
+		AnmCtxNode anmCtxNodes1[8191];
+		DWORD nextAnmCtxNode2Index;			// 下一个分配的AnmCtxNode2索引
+		DWORD totalAllocAnmCtx2Count;		// 和上面区别是这个不会被清0
+		LinkNode<AnmCtxNode> anmCtxNode2Link;
+		AnmCtxNode anmCtxNodes2[8191];		// AnmContext池，需要新的AnmContext优先从这里分配
+		LinkNode<AnmCtxNode> anmCtxNode1Link;
+		DWORD unknown4;
+		AnmManager* pAnmManager[30];		// ANM资源
+		BYTE unknown5[64];
+		AnmContext unknown6;
+		DWORD unknown7;
+
+		// 这一部分都是关于D3D(固定渲染管线)状态的东西
+
+		DWORD CurTextureFactor;				// D3DRS_TEXTUREFACTOR
+		DWORD CurTextureID;					// 高8位是AnmManager索引，低8位是Img索引
+		BYTE CurBlendMode;
+		BYTE unknown8;
+		BYTE CurVertexBufferType;			// 好像决定了用DrawPrimitive还是DrawPrimitiveUP吧？
+		BYTE unknown9[3];
+		BYTE CurSampleFilter;
+		BYTE CurBlendOp;
+		BYTE CurAddressU;
+		BYTE CurAddressV;
+		BYTE unknown10[6];
+		IDirect3DVertexBuffer9* pD3DVertexBuffer;
+
+		BYTE unknown11[80];
+		DWORD rectPrimitiveCount;			// 三角片数量的一半，即矩形数量
+		// 东方的优化策略：渲染函数只是向顶点缓冲区添加顶点，直到渲染状态改变了(比如换纹理)才真正渲染
+		Vertex1 vertex1Buf[131072];			// 渲染时向这里添加顶点1
+		Vertex1* pNextVertex1Buf;			// 指向下一个添加顶点1的位置
+		Vertex1* pCurVertex1Buf;			// 指向当前准备渲染的顶点1缓冲的位置
+		DWORD unknown12;
+		Vertex2 vertex2Buf[32768];			// 渲染时向这里添加顶点2
+		Vertex2* pNextVertex2Buf;			// 指向下一个添加顶点2的位置
+		Vertex2* pCurVertex2Buf;			// 指向当前准备渲染的顶点2缓冲的位置
+		AnmContext unknown13[42];
+		DWORD topAnmCtxNode1Index;
+		BYTE unknown14[8];
+	};
+	CHECK_SIZE(RenderEngine, 0x1CAF97C);
+	
 #pragma pack(pop)
 
 
@@ -270,6 +431,7 @@ namespace THAPI
 	extern TML_API HINSTANCE& g_hInstance;
 
 	extern TML_API ModulesLinks*& g_pModulesLinks;	// 储存逻辑链表和渲染链表，每帧被遍历调用
+	extern TML_API RenderEngine*& g_pRenderEngine;	// 储存渲染用的资源和状态
 	extern TML_API Stage*& g_pStage;				// 每个关卡初始化一次的全局变量
 
 	extern TML_API float& g_ticksPerFrame;			// 用来控制游戏速度
