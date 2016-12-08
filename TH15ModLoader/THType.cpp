@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "THType.h"
+#include <THType.h>
 
 
 namespace THAPI

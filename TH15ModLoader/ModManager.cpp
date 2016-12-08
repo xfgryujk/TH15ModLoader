@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "ModManager.h"
-#include "ModEvent.h"
+#include <ModEvent.h>
 
 
 namespace tml

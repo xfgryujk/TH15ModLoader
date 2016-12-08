@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
-#include "THInitEvent.h"
+#include <THInitEvent.h>
 #include "THInitHook.h"
 #include "THInit.h"
-#include "THFunction.h"
+#include <THFunction.h>
 using namespace THAPI;
 
 

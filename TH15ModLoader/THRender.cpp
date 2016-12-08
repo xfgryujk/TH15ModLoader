@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "THRenderEvent.h"
+#include <THRenderEvent.h>
 #include "THRenderHook.h"
 #include "THRender.h"
 using namespace THAPI;

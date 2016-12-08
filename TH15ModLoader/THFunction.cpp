@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "THFunction.h"
+#include <THFunction.h>
 #include "THInitHook.h"
 using namespace tml;
 

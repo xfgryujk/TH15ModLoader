@@ -39,27 +39,6 @@
     <ClInclude Include="ModManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ModEvent.h">
-      <Filter>头文件\API</Filter>
-    </ClInclude>
-    <ClInclude Include="THType.h">
-      <Filter>头文件\API</Filter>
-    </ClInclude>
-    <ClInclude Include="APIHeader.h">
-      <Filter>头文件\API</Filter>
-    </ClInclude>
-    <ClInclude Include="THFunction.h">
-      <Filter>头文件\API</Filter>
-    </ClInclude>
-    <ClInclude Include="THInitEvent.h">
-      <Filter>头文件\API</Filter>
-    </ClInclude>
-    <ClInclude Include="THLogicEvent.h">
-      <Filter>头文件\API</Filter>
-    </ClInclude>
-    <ClInclude Include="THRenderEvent.h">
-      <Filter>头文件\API</Filter>
-    </ClInclude>
     <ClInclude Include="TMLModule.h">
       <Filter>头文件\TMLModule</Filter>
     </ClInclude>
@@ -83,6 +62,27 @@
     </ClInclude>
     <ClInclude Include="THRenderHook.h">
       <Filter>头文件\TMLModule</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\THType.h">
+      <Filter>头文件\API</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\APIHeader.h">
+      <Filter>头文件\API</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ModEvent.h">
+      <Filter>头文件\API</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\THFunction.h">
+      <Filter>头文件\API</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\THInitEvent.h">
+      <Filter>头文件\API</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\THLogicEvent.h">
+      <Filter>头文件\API</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\THRenderEvent.h">
+      <Filter>头文件\API</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

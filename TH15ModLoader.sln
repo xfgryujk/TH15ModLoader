@@ -10,6 +10,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModSample", "ModSample\ModS
 		{54E9C39A-AF3A-4726-AB8D-1E7F13CD7414} = {54E9C39A-AF3A-4726-AB8D-1E7F13CD7414}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Property", "Property", "{9E195589-C4D1-423D-A362-246656798AAC}"
+	ProjectSection(SolutionItems) = preProject
+		CommonProperty.props = CommonProperty.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32

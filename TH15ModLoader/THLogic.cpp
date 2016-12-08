@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "THLogicEvent.h"
+#include <THLogicEvent.h>
 #include "THLogicHook.h"
 #include "THLogic.h"
 using namespace THAPI;
